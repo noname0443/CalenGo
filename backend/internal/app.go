@@ -17,7 +17,7 @@ func NewApp(port string) *App {
 	}
 
 	app.fiberApp.Get("/", func(c *fiber.Ctx) error {
-		logrus.Info("Hello world!")
+		logrus.Info("Hello, world!")
 		return c.SendString("Hello, World!")
 	})
 
