@@ -1,13 +1,14 @@
 package tests
 
 import (
-	"backend/internal"
 	"io"
 	"math"
 	"net/http"
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/noname0443/CalenGo/backend/internal"
 
 	"github.com/sirupsen/logrus"
 )
@@ -32,7 +33,7 @@ func TestHelloWorld(t *testing.T) {
 	go app.Run()
 
 	err := doRetry(func() error {
-		resp, err := http.Get("http://0.0.0.0:3000/")
+		resp, err := http.Get("http://0.0.0.0:3000/api/v1/note/1")
 		if err != nil {
 			return err
 		}
@@ -44,7 +45,7 @@ func TestHelloWorld(t *testing.T) {
 		}
 
 		logrus.Info(buf.String())
-		if buf.String() != "Hello, World!" {
+		if buf.String() != "{\"error_message\":\"not implemented\"}" {
 			t.Error("bad value for / request")
 		}
 		return nil

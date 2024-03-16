@@ -1,8 +1,9 @@
 package main
 
 import (
-	"backend/internal"
 	"os"
+
+	"github.com/noname0443/CalenGo/backend/internal"
 
 	"github.com/sirupsen/logrus"
 )
@@ -10,7 +11,7 @@ import (
 func main() {
 	initLogger(test)
 
-	app := internal.NewApp(":3000")
+	app := internal.NewApp(":1516")
 	app.Run()
 }
 

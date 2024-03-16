@@ -1,0 +1,221 @@
+openapi: 3.1.0
+x-stoplight:
+  id: qqjvy7f5cwsjt
+info:
+  title: CalenGo
+  version: '1.0'
+servers: []
+paths:
+  '/api/v1/note/{note}':
+    get:
+      summary: Your GET endpoint
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Note'
+        '400':
+          description: Bad Request
+      operationId: get-api-v1-note
+      x-stoplight:
+        id: 3j0zd6kypal3w
+      x-internal: false
+      parameters:
+        - name: note
+          schema:
+            type: string
+          in: path
+          required: true
+  /api/v1/note:
+    post:
+      summary: Your POST endpoint
+      tags: []
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Bad Request
+      operationId: post-api-v1-note
+      x-stoplight:
+        id: iou7qiwhxy4bw
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Note'
+      parameters: []
+    put:
+      summary: Your POST endpoint
+      tags: []
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Bad Request
+      operationId: put-api-v1-note
+      x-stoplight:
+        id: s5mnqtp3adtzr
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Note'
+      parameters: []
+    delete:
+      summary: Your POST endpoint
+      tags: []
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Bad Request
+      operationId: delete-api-v1-note
+      x-stoplight:
+        id: 0ke1mek07w66y
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Note'
+      parameters: []
+    get:
+      summary: Your GET endpoint
+      tags: []
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Bad Request
+      operationId: list-api-v1-note
+      x-stoplight:
+        id: qdsnyli6beuy6
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Note'
+      parameters: []
+  '/api/v1/user/{user}':
+    get:
+      summary: Your GET endpoint
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          description: Bad Request
+      operationId: get-api-v1-user
+      x-stoplight:
+        id: 54far6e9nxjya
+      x-internal: false
+      parameters:
+        - name: user
+          schema:
+            type: string
+          in: path
+          required: true
+  /api/v1/user:
+    post:
+      summary: Your POST endpoint
+      tags: []
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Bad Request
+      operationId: post-api-v1-user
+      x-stoplight:
+        id: 1monbbbn7vn9z
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      parameters: []
+    put:
+      summary: Your POST endpoint
+      tags: []
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Bad Request
+      operationId: put-api-v1-user
+      x-stoplight:
+        id: sgb9kuiww8xur
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      parameters: []
+    delete:
+      summary: Your POST endpoint
+      tags: []
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Bad Request
+      operationId: delete-api-v1-user
+      x-stoplight:
+        id: sbwrijkjmj371
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      parameters: []
+components:
+  schemas:
+    User:
+      title: User
+      type: object
+      examples:
+        - id: 142
+          firstName: Alice
+          lastName: Smith
+          email: alice.smith@gmail.com
+          dateOfBirth: '1997-10-31'
+          emailVerified: true
+          signUpDate: '2019-08-24'
+      x-stoplight:
+        id: 9iipnr1t27u9c
+      properties:
+        name:
+          type: string
+          x-stoplight:
+            id: cf351ofavnemz
+        password:
+          type: string
+          x-stoplight:
+            id: zaazstoax46tr
+    Note:
+      title: Note
+      x-stoplight:
+        id: 44gq3bdi5b4jx
+      type: object
+      properties:
+        name:
+          type: string
+          x-stoplight:
+            id: fmp0y98emh7kp
+        description:
+          type: string
+          x-stoplight:
+            id: 6lriuybzrervs
+        startTime:
+          type: string
+          x-stoplight:
+            id: h1nzksav66oul
+        endTime:
+          type: string
+          x-stoplight:
+            id: m8knttog2hy8f
