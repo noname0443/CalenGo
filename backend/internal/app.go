@@ -1,32 +1,38 @@
 package internal
 
 import (
-	"github.com/gofiber/fiber/v2"
+	"net/http"
+
+	api "github.com/noname0443/CalenGo/backend/api"
+	"github.com/rs/cors"
 	"github.com/sirupsen/logrus"
 )
 
 type App struct {
-	fiberApp *fiber.App
-	port     string
+	api.UnimplementedHandler
+	port string
 }
 
 func NewApp(port string) *App {
-	app := &App{
-		fiberApp: fiber.New(),
-		port:     port,
+	return &App{
+		port: port,
 	}
-
-	app.fiberApp.Get("/", func(c *fiber.Ctx) error {
-		logrus.Info("Hello, world!")
-		return c.SendString("Hello, World!")
-	})
-
-	return app
 }
 
 func (app *App) Run() {
-	err := app.fiberApp.Listen(app.port)
+	serv, err := api.NewServer(app, []api.ServerOption{}...)
 	if err != nil {
+		logrus.Fatal(err)
+	}
+
+	c := cors.New(cors.Options{
+		AllowedOrigins:   []string{"*"},
+		AllowCredentials: true,
+		AllowedHeaders:   []string{"User-Agent"},
+	})
+
+	logrus.Info("Server starting!")
+	if err := http.ListenAndServe(app.port, c.Handler(serv)); err != nil {
 		logrus.Fatal(err)
 	}
 }

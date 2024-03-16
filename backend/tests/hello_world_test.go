@@ -1,13 +1,14 @@
 package tests
 
 import (
-	"backend/internal"
 	"io"
 	"math"
 	"net/http"
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/noname0443/CalenGo/backend/internal"
 
 	"github.com/sirupsen/logrus"
 )

@@ -1,8 +1,12 @@
-import { render, screen } from '@testing-library/react';
-import App from './App';
+import { render } from '@testing-library/vue'
+import App from './App.vue'
 
-test('renders learn react link', () => {
-  render(<App />);
-  const linkElement = screen.getByText(/learn react/i);
-  expect(linkElement).toBeInTheDocument();
-});
+test('it should work', () => {
+  const { getByText } = render(App, {
+    props: {
+
+    }
+  })
+
+  getByText('You did it!')
+})
