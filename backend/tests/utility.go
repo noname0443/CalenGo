@@ -1,14 +1,12 @@
 package tests
 
 import (
+	"fmt"
 	"io"
 	"math"
 	"net/http"
 	"strings"
-	"testing"
 	"time"
-
-	"github.com/noname0443/CalenGo/backend/internal"
 
 	"github.com/sirupsen/logrus"
 )
@@ -28,29 +26,41 @@ func doRetry(function func() error) error {
 	return err
 }
 
-func TestHelloWorld(t *testing.T) {
-	app := internal.NewApp(":3000")
-	go app.Run()
+func Get(ip string) error {
+	resp, err := http.Get(fmt.Sprintf("http://%s/", ip))
+	if err != nil {
+		return err
+	}
 
-	err := doRetry(func() error {
-		resp, err := http.Get("http://0.0.0.0:3000/api/v1/note/1")
+	_, err = ReadAll(resp.Body)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func checkServerIsWorking(ip string) error {
+	return doRetry(func() error {
+		resp, err := http.Get(fmt.Sprintf("http://%s/", ip))
 		if err != nil {
 			return err
 		}
 
-		buf := new(strings.Builder)
-		_, err = io.Copy(buf, resp.Body)
+		_, err = ReadAll(resp.Body)
 		if err != nil {
 			return err
 		}
 
-		logrus.Info(buf.String())
-		if buf.String() != "{\"error_message\":\"not implemented\"}" {
-			t.Error("bad value for / request")
-		}
 		return nil
 	})
+}
+
+func ReadAll(reader io.ReadCloser) (string, error) {
+	buf := new(strings.Builder)
+	_, err := io.Copy(buf, reader)
 	if err != nil {
-		t.Error(err)
+		return "", err
 	}
+	return buf.String(), nil
 }
