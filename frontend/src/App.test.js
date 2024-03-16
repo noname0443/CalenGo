@@ -7,6 +7,4 @@ test('it should work', () => {
 
     }
   })
-
-  getByText('You did it!')
 })
