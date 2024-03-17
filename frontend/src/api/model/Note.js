@@ -22,10 +22,14 @@ class Note {
     /**
      * Constructs a new <code>Note</code>.
      * @alias module:model/Note
+     * @param name {String} 
+     * @param description {String} 
+     * @param startTime {String} 
+     * @param endTime {String} 
      */
-    constructor() { 
+    constructor(name, description, startTime, endTime) { 
         
-        Note.initialize(this);
+        Note.initialize(this, name, description, startTime, endTime);
     }
 
     /**
@@ -33,7 +37,11 @@ class Note {
      * This method is used by the constructors of any subclasses, in order to implement multiple inheritance (mix-ins).
      * Only for internal use.
      */
-    static initialize(obj) { 
+    static initialize(obj, name, description, startTime, endTime) { 
+        obj['name'] = name;
+        obj['description'] = description;
+        obj['startTime'] = startTime;
+        obj['endTime'] = endTime;
     }
 
     /**
@@ -69,6 +77,12 @@ class Note {
      * @return {boolean} to indicate whether the JSON data is valid with respect to <code>Note</code>.
      */
     static validateJSON(data) {
+        // check to make sure all required properties are present in the JSON string
+        for (const property of Note.RequiredProperties) {
+            if (!data.hasOwnProperty(property)) {
+                throw new Error("The required field `" + property + "` is not found in the JSON data: " + JSON.stringify(data));
+            }
+        }
         // ensure the json data is a string
         if (data['name'] && !(typeof data['name'] === 'string' || data['name'] instanceof String)) {
             throw new Error("Expected the field `name` to be a primitive type in the JSON string but got " + data['name']);
@@ -92,7 +106,7 @@ class Note {
 
 }
 
-
+Note.RequiredProperties = ["name", "description", "startTime", "endTime"];
 
 /**
  * @member {String} name

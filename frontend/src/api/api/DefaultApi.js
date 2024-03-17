@@ -199,7 +199,7 @@ export default class DefaultApi {
      * Callback function to receive the result of the listApiV1Note operation.
      * @callback module:api/DefaultApi~listApiV1NoteCallback
      * @param {String} error Error message, if any.
-     * @param data This operation does not return a value.
+     * @param {Array.<module:model/Note>} data The data returned by the service call.
      * @param {String} response The complete HTTP response.
      */
 
@@ -208,6 +208,7 @@ export default class DefaultApi {
      * @param {Object} opts Optional parameters
      * @param {module:model/Note} [note] 
      * @param {module:api/DefaultApi~listApiV1NoteCallback} callback The callback function, accepting three arguments: error, data, response
+     * data is of type: {@link Array.<module:model/Note>}
      */
     listApiV1Note(opts, callback) {
       opts = opts || {};
@@ -224,8 +225,8 @@ export default class DefaultApi {
 
       let authNames = [];
       let contentTypes = ['application/json'];
-      let accepts = [];
-      let returnType = null;
+      let accepts = ['application/json'];
+      let returnType = [Note];
       return this.apiClient.callApi(
         '/api/v1/note', 'GET',
         pathParams, queryParams, headerParams, formParams, postBody,

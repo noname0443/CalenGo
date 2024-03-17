@@ -3,6 +3,7 @@ package main
 import (
 	"os"
 
+	"github.com/jmoiron/sqlx"
 	"github.com/noname0443/CalenGo/backend/internal"
 
 	"github.com/sirupsen/logrus"
@@ -11,7 +12,12 @@ import (
 func main() {
 	initLogger(test)
 
-	app := internal.NewApp(":1516")
+	db, err := sqlx.Connect("mysql", "root:root@(localhost:3306)/sys")
+	if err != nil {
+		logrus.Fatal(err)
+	}
+
+	app := internal.NewApp(":1516", db)
 	app.Run()
 }
 

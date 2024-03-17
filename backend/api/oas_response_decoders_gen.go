@@ -10,9 +10,7 @@ import (
 	"github.com/go-faster/errors"
 	"github.com/go-faster/jx"
 
-	"github.com/ogen-go/ogen/conv"
 	"github.com/ogen-go/ogen/ogenerrors"
-	"github.com/ogen-go/ogen/uri"
 	"github.com/ogen-go/ogen/validate"
 )
 
@@ -73,121 +71,7 @@ func decodeGetAPIV1NoteResponse(resp *http.Response) (res GetAPIV1NoteRes, _ err
 				}
 				return res, err
 			}
-			var wrapper NoteHeaders
-			wrapper.Response = response
-			h := uri.NewHeaderDecoder(resp.Header)
-			// Parse "Access-Control-Allow-Headers" header.
-			{
-				cfg := uri.HeaderParameterDecodingConfig{
-					Name:    "Access-Control-Allow-Headers",
-					Explode: false,
-				}
-				if err := func() error {
-					if err := h.HasParam(cfg); err == nil {
-						if err := h.DecodeParam(cfg, func(d uri.Decoder) error {
-							var wrapperDotAccessControlAllowHeadersVal string
-							if err := func() error {
-								val, err := d.DecodeValue()
-								if err != nil {
-									return err
-								}
-
-								c, err := conv.ToString(val)
-								if err != nil {
-									return err
-								}
-
-								wrapperDotAccessControlAllowHeadersVal = c
-								return nil
-							}(); err != nil {
-								return err
-							}
-							wrapper.AccessControlAllowHeaders.SetTo(wrapperDotAccessControlAllowHeadersVal)
-							return nil
-						}); err != nil {
-							return err
-						}
-					}
-					return nil
-				}(); err != nil {
-					return res, errors.Wrap(err, "parse Access-Control-Allow-Headers header")
-				}
-			}
-			// Parse "Access-Control-Allow-Methods" header.
-			{
-				cfg := uri.HeaderParameterDecodingConfig{
-					Name:    "Access-Control-Allow-Methods",
-					Explode: false,
-				}
-				if err := func() error {
-					if err := h.HasParam(cfg); err == nil {
-						if err := h.DecodeParam(cfg, func(d uri.Decoder) error {
-							var wrapperDotAccessControlAllowMethodsVal string
-							if err := func() error {
-								val, err := d.DecodeValue()
-								if err != nil {
-									return err
-								}
-
-								c, err := conv.ToString(val)
-								if err != nil {
-									return err
-								}
-
-								wrapperDotAccessControlAllowMethodsVal = c
-								return nil
-							}(); err != nil {
-								return err
-							}
-							wrapper.AccessControlAllowMethods.SetTo(wrapperDotAccessControlAllowMethodsVal)
-							return nil
-						}); err != nil {
-							return err
-						}
-					}
-					return nil
-				}(); err != nil {
-					return res, errors.Wrap(err, "parse Access-Control-Allow-Methods header")
-				}
-			}
-			// Parse "Access-Control-Allow-Origin" header.
-			{
-				cfg := uri.HeaderParameterDecodingConfig{
-					Name:    "Access-Control-Allow-Origin",
-					Explode: false,
-				}
-				if err := func() error {
-					if err := h.HasParam(cfg); err == nil {
-						if err := h.DecodeParam(cfg, func(d uri.Decoder) error {
-							var wrapperDotAccessControlAllowOriginVal string
-							if err := func() error {
-								val, err := d.DecodeValue()
-								if err != nil {
-									return err
-								}
-
-								c, err := conv.ToString(val)
-								if err != nil {
-									return err
-								}
-
-								wrapperDotAccessControlAllowOriginVal = c
-								return nil
-							}(); err != nil {
-								return err
-							}
-							wrapper.AccessControlAllowOrigin.SetTo(wrapperDotAccessControlAllowOriginVal)
-							return nil
-						}); err != nil {
-							return err
-						}
-					}
-					return nil
-				}(); err != nil {
-					return res, errors.Wrap(err, "parse Access-Control-Allow-Origin header")
-				}
-			}
-			return &wrapper, nil
+			return &response, nil
 		default:
 			return res, validate.InvalidContentType(ct)
 		}
@@ -246,7 +130,48 @@ func decodeListAPIV1NoteResponse(resp *http.Response) (res ListAPIV1NoteRes, _ e
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
-		return &ListAPIV1NoteOK{}, nil
+		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
+		if err != nil {
+			return res, errors.Wrap(err, "parse media type")
+		}
+		switch {
+		case ct == "application/json":
+			buf, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return res, err
+			}
+			d := jx.DecodeBytes(buf)
+
+			var response ListAPIV1NoteOKApplicationJSON
+			if err := func() error {
+				if err := response.Decode(d); err != nil {
+					return err
+				}
+				if err := d.Skip(); err != io.EOF {
+					return errors.New("unexpected trailing data")
+				}
+				return nil
+			}(); err != nil {
+				err = &ogenerrors.DecodeBodyError{
+					ContentType: ct,
+					Body:        buf,
+					Err:         err,
+				}
+				return res, err
+			}
+			// Validate response.
+			if err := func() error {
+				if err := response.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return res, errors.Wrap(err, "validate")
+			}
+			return &response, nil
+		default:
+			return res, validate.InvalidContentType(ct)
+		}
 	case 400:
 		// Code 400.
 		return &ListAPIV1NoteBadRequest{}, nil

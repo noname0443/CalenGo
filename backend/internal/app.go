@@ -3,6 +3,7 @@ package internal
 import (
 	"net/http"
 
+	"github.com/jmoiron/sqlx"
 	api "github.com/noname0443/CalenGo/backend/api"
 	"github.com/rs/cors"
 	"github.com/sirupsen/logrus"
@@ -11,11 +12,13 @@ import (
 type App struct {
 	api.UnimplementedHandler
 	port string
+	db   *sqlx.DB
 }
 
-func NewApp(port string) *App {
+func NewApp(port string, db *sqlx.DB) *App {
 	return &App{
 		port: port,
+		db:   db,
 	}
 }
 

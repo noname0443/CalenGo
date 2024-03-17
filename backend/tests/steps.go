@@ -3,19 +3,108 @@ package tests
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"os"
+	"reflect"
+	"strings"
 
 	"github.com/cucumber/godog"
+	docker "github.com/fsouza/go-dockerclient"
+	_ "github.com/go-sql-driver/mysql"
+	"github.com/jmoiron/sqlx"
 	"github.com/noname0443/CalenGo/backend/api"
 	"github.com/noname0443/CalenGo/backend/internal"
 )
 
+type FeatureManager struct {
+	lastResult   interface{}
+	ip           string
+	DockerClient *docker.Client
+}
+
 func NewFeatureManager() (*FeatureManager, error) {
-	return &FeatureManager{}, nil
+	dockerClient, err := docker.NewClientFromEnv()
+	if err != nil {
+		return nil, err
+	}
+	return &FeatureManager{
+		DockerClient: dockerClient,
+	}, nil
+}
+
+func (fm *FeatureManager) StepCleanup(ctx context.Context) (context.Context, error) {
+	err := fm.DockerClient.RemoveContainer(docker.RemoveContainerOptions{
+		ID:    "test-mysql-integration-backend",
+		Force: true,
+	})
+	return ctx, err
 }
 
 func (fm *FeatureManager) StepStartServerOn(ctx context.Context, ip string) (context.Context, error) {
-	app := internal.NewApp(ip)
+	config := &docker.Config{
+		Hostname: "test-mysql-integration-backend",
+		Image:    "mysql",
+		Env: []string{
+			fmt.Sprintf("MYSQL_ROOT_PASSWORD=%s", "root"),
+		},
+		ExposedPorts: map[docker.Port]struct{}{
+			docker.Port(fmt.Sprintf("%d/tcp", 15155)): struct{}{},
+		},
+	}
+
+	hostConfig := &docker.HostConfig{
+		PortBindings: map[docker.Port][]docker.PortBinding{
+			docker.Port(fmt.Sprintf("%d/tcp", 3306)): []docker.PortBinding{
+				{
+					HostPort: fmt.Sprintf("%d", 15155),
+				},
+			},
+		},
+	}
+
+	resp, err := fm.DockerClient.CreateContainer(docker.CreateContainerOptions{
+		Name:       "test-mysql-integration-backend",
+		Config:     config,
+		HostConfig: hostConfig,
+	})
+	if err != nil {
+		return ctx, err
+	}
+
+	if err := fm.DockerClient.StartContainer(resp.ID, &docker.HostConfig{}); err != nil {
+		return ctx, err
+	}
+
+	var db *sqlx.DB
+	err = doRetry(func() error {
+		db, err = sqlx.Connect("mysql", "root:root@(localhost:15155)/sys")
+		if err != nil {
+			return err
+		}
+		return nil
+	})
+	if err != nil {
+		return ctx, err
+	}
+
+	filedata, err := os.ReadFile("../../init-mysql.sql")
+	if err != nil {
+		return ctx, err
+	}
+
+	requests := strings.Split(string(filedata), ";")
+	for _, request := range requests {
+		if len(request) == 0 {
+			continue
+		}
+		_, err = db.Exec(request)
+		if err != nil {
+			return ctx, err
+		}
+	}
+
+	app := internal.NewApp(ip, db)
 	fm.ip = ip
 	go app.Run()
 	return ctx, nil
@@ -204,7 +293,24 @@ func (fm *FeatureManager) iGotLine(ctx context.Context, line string) (context.Co
 	return ctx, nil
 }
 
-type FeatureManager struct {
-	lastResult interface{}
-	ip         string
+func (fm *FeatureManager) iGotData(ctx context.Context, data *godog.DocString) (context.Context, error) {
+	UnmarshaledStruct := reflect.New(reflect.TypeOf(fm.lastResult)).Interface()
+	err := json.Unmarshal([]byte(data.Content), UnmarshaledStruct)
+	valueAsLastResult := reflect.Indirect(reflect.ValueOf(UnmarshaledStruct))
+	lastResult := reflect.ValueOf(fm.lastResult)
+	if err != nil {
+		return ctx, err
+	}
+	if !reflect.DeepEqual(lastResult.Interface(), valueAsLastResult.Interface()) {
+		return ctx, errors.New(fmt.Sprintf("%s not equal to %s. Types: %s:%s", lastResult, valueAsLastResult, lastResult.Type(), valueAsLastResult.Type()))
+	}
+	return ctx, err
+}
+
+func (fm *FeatureManager) iGotNoError(ctx context.Context) (context.Context, error) {
+	err, ok := fm.lastResult.(error)
+	if !ok {
+		return ctx, nil
+	}
+	return ctx, err
 }

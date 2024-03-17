@@ -37,108 +37,59 @@ type ListAPIV1NoteBadRequest struct{}
 
 func (*ListAPIV1NoteBadRequest) listAPIV1NoteRes() {}
 
-// ListAPIV1NoteOK is response for ListAPIV1Note operation.
-type ListAPIV1NoteOK struct{}
+type ListAPIV1NoteOKApplicationJSON []Note
 
-func (*ListAPIV1NoteOK) listAPIV1NoteRes() {}
+func (*ListAPIV1NoteOKApplicationJSON) listAPIV1NoteRes() {}
 
 // Ref: #/components/schemas/Note
 type Note struct {
-	Name        OptString `json:"name"`
-	Description OptString `json:"description"`
-	StartTime   OptString `json:"startTime"`
-	EndTime     OptString `json:"endTime"`
+	Name        string `json:"name" db:"name"`
+	Description string `json:"description" db:"description"`
+	StartTime   string `json:"startTime" db:"start_time"`
+	EndTime     string `json:"endTime" db:"end_time"`
 }
 
 // GetName returns the value of Name.
-func (s *Note) GetName() OptString {
+func (s *Note) GetName() string {
 	return s.Name
 }
 
 // GetDescription returns the value of Description.
-func (s *Note) GetDescription() OptString {
+func (s *Note) GetDescription() string {
 	return s.Description
 }
 
 // GetStartTime returns the value of StartTime.
-func (s *Note) GetStartTime() OptString {
+func (s *Note) GetStartTime() string {
 	return s.StartTime
 }
 
 // GetEndTime returns the value of EndTime.
-func (s *Note) GetEndTime() OptString {
+func (s *Note) GetEndTime() string {
 	return s.EndTime
 }
 
 // SetName sets the value of Name.
-func (s *Note) SetName(val OptString) {
+func (s *Note) SetName(val string) {
 	s.Name = val
 }
 
 // SetDescription sets the value of Description.
-func (s *Note) SetDescription(val OptString) {
+func (s *Note) SetDescription(val string) {
 	s.Description = val
 }
 
 // SetStartTime sets the value of StartTime.
-func (s *Note) SetStartTime(val OptString) {
+func (s *Note) SetStartTime(val string) {
 	s.StartTime = val
 }
 
 // SetEndTime sets the value of EndTime.
-func (s *Note) SetEndTime(val OptString) {
+func (s *Note) SetEndTime(val string) {
 	s.EndTime = val
 }
 
-// NoteHeaders wraps Note with response headers.
-type NoteHeaders struct {
-	AccessControlAllowHeaders OptString
-	AccessControlAllowMethods OptString
-	AccessControlAllowOrigin  OptString
-	Response                  Note
-}
-
-// GetAccessControlAllowHeaders returns the value of AccessControlAllowHeaders.
-func (s *NoteHeaders) GetAccessControlAllowHeaders() OptString {
-	return s.AccessControlAllowHeaders
-}
-
-// GetAccessControlAllowMethods returns the value of AccessControlAllowMethods.
-func (s *NoteHeaders) GetAccessControlAllowMethods() OptString {
-	return s.AccessControlAllowMethods
-}
-
-// GetAccessControlAllowOrigin returns the value of AccessControlAllowOrigin.
-func (s *NoteHeaders) GetAccessControlAllowOrigin() OptString {
-	return s.AccessControlAllowOrigin
-}
-
-// GetResponse returns the value of Response.
-func (s *NoteHeaders) GetResponse() Note {
-	return s.Response
-}
-
-// SetAccessControlAllowHeaders sets the value of AccessControlAllowHeaders.
-func (s *NoteHeaders) SetAccessControlAllowHeaders(val OptString) {
-	s.AccessControlAllowHeaders = val
-}
-
-// SetAccessControlAllowMethods sets the value of AccessControlAllowMethods.
-func (s *NoteHeaders) SetAccessControlAllowMethods(val OptString) {
-	s.AccessControlAllowMethods = val
-}
-
-// SetAccessControlAllowOrigin sets the value of AccessControlAllowOrigin.
-func (s *NoteHeaders) SetAccessControlAllowOrigin(val OptString) {
-	s.AccessControlAllowOrigin = val
-}
-
-// SetResponse sets the value of Response.
-func (s *NoteHeaders) SetResponse(val Note) {
-	s.Response = val
-}
-
-func (*NoteHeaders) getAPIV1NoteRes() {}
+func (*Note) getAPIV1NoteRes() {}
 
 // NewOptNote returns new OptNote with value set to v.
 func NewOptNote(v Note) OptNote {
@@ -180,52 +131,6 @@ func (o OptNote) Get() (v Note, ok bool) {
 
 // Or returns value if set, or given parameter if does not.
 func (o OptNote) Or(d Note) Note {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptString returns new OptString with value set to v.
-func NewOptString(v string) OptString {
-	return OptString{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptString is optional string.
-type OptString struct {
-	Value string
-	Set   bool
-}
-
-// IsSet returns true if OptString was set.
-func (o OptString) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptString) Reset() {
-	var v string
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptString) SetTo(v string) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptString) Get() (v string, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptString) Or(d string) string {
 	if v, ok := o.Get(); ok {
 		return v
 	}
@@ -320,27 +225,27 @@ func (*PutAPIV1UserOK) putAPIV1UserRes() {}
 
 // Ref: #/components/schemas/User
 type User struct {
-	Name     OptString `json:"name"`
-	Password OptString `json:"password"`
+	Name     string `json:"name" db:"name"`
+	Password string `json:"password" db:"password"`
 }
 
 // GetName returns the value of Name.
-func (s *User) GetName() OptString {
+func (s *User) GetName() string {
 	return s.Name
 }
 
 // GetPassword returns the value of Password.
-func (s *User) GetPassword() OptString {
+func (s *User) GetPassword() string {
 	return s.Password
 }
 
 // SetName sets the value of Name.
-func (s *User) SetName(val OptString) {
+func (s *User) SetName(val string) {
 	s.Name = val
 }
 
 // SetPassword sets the value of Password.
-func (s *User) SetPassword(val OptString) {
+func (s *User) SetPassword(val string) {
 	s.Password = val
 }
 
