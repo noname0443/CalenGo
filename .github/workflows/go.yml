@@ -19,4 +19,5 @@ jobs:
       uses: actions/setup-go@v4
       with:
         go-version: '1.21'
+    - run: docker pull mysql
     - run: go test ./tests/... -v -count=1
