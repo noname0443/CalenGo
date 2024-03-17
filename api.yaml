@@ -87,6 +87,14 @@ paths:
       responses:
         '200':
           description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Note'
+                  x-stoplight:
+                    id: eyde7rw1bbur6
         '400':
           description: Bad Request
       operationId: list-api-v1-note
@@ -188,34 +196,54 @@ components:
           signUpDate: '2019-08-24'
       x-stoplight:
         id: 9iipnr1t27u9c
+      required:
+        - name
+        - password
       properties:
         name:
           type: string
           x-stoplight:
             id: cf351ofavnemz
+          x-oapi-codegen-extra-tags:
+            db: name
         password:
           type: string
           x-stoplight:
             id: zaazstoax46tr
+          x-oapi-codegen-extra-tags:
+            db: password
     Note:
       title: Note
       x-stoplight:
         id: 44gq3bdi5b4jx
       type: object
+      required:
+        - name
+        - description
+        - startTime
+        - endTime
       properties:
         name:
           type: string
           x-stoplight:
             id: fmp0y98emh7kp
+          x-oapi-codegen-extra-tags:
+            db: name
         description:
           type: string
           x-stoplight:
             id: 6lriuybzrervs
+          x-oapi-codegen-extra-tags:
+            db: description
         startTime:
           type: string
           x-stoplight:
             id: h1nzksav66oul
+          x-oapi-codegen-extra-tags:
+            db: start_time
         endTime:
           type: string
           x-stoplight:
             id: m8knttog2hy8f
+          x-oapi-codegen-extra-tags:
+            db: end_time

@@ -11,7 +11,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-const RETRY_COUNT = 5
+const RETRY_COUNT = 8
 
 func doRetry(function func() error) error {
 	var err error

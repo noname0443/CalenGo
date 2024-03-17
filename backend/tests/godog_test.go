@@ -33,9 +33,14 @@ func TestFeatures(t *testing.T) {
 			TestingT:      t,
 		},
 	}
+	t.Cleanup(func() {
+		fm.StepCleanup(context.Background())
+	})
 
 	if suite.Run() != 0 {
 		logrus.Info("non-zero status returned, failed to run feature tests")
+		_, err := fm.StepCleanup(context.Background())
+		logrus.Error(err)
 	}
 }
 
@@ -57,4 +62,6 @@ func InitializeScenario(fm *FeatureManager, sc *godog.ScenarioContext) {
 	sc.Step(`^I DELETE user /api/v1/user$`, fm.StepDeleteUser)
 
 	sc.Step(`^I got line "([^"]*)"$`, fm.iGotLine)
+	sc.Step(`^I got data$`, fm.iGotData)
+	sc.Step(`^I got no error$`, fm.iGotNoError)
 }
