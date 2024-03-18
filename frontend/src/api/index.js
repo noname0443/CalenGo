@@ -13,6 +13,7 @@
 
 
 import ApiClient from './ApiClient';
+import ListApiV1NoteRequest from './model/ListApiV1NoteRequest';
 import Note from './model/Note';
 import User from './model/User';
 import DefaultApi from './api/DefaultApi';
@@ -55,6 +56,12 @@ export {
      * @property {module:ApiClient}
      */
     ApiClient,
+
+    /**
+     * The ListApiV1NoteRequest model constructor.
+     * @property {module:model/ListApiV1NoteRequest}
+     */
+    ListApiV1NoteRequest,
 
     /**
      * The Note model constructor.

@@ -8,14 +8,15 @@ import Note from './api/model/Note';
 import User from './api/model/User';
 import DefaultApi from './api/api/DefaultApi';
 import { Modal } from 'usemodal-vue3';
+import ListApiV1NoteRequest from './api/model/ListApiV1NoteRequest';
 
 let isVisible = ref(false);
 let counter = 1;
-let backend = 'http://localhost:1516'
-let notes = reactive([])
-let status = ref("nothing");
+let BACKEND_URL = 'http://localhost:1516'
+let global_notes = reactive([])
+let global_status = ref("nothing");
 
-let note = {
+let global_note = {
   name: '',
   description: '',
   startTime: '',
@@ -23,7 +24,7 @@ let note = {
 };
 
 function Get(note) {
-  let apiClient = new ApiClient(backend);
+  let apiClient = new ApiClient(BACKEND_URL);
   let xxxSvc = new DefaultApi(apiClient);
   let zzz = xxxSvc.getApiV1Note(note, function (error, data, response) {
     console.log(error, data, response)
@@ -31,26 +32,30 @@ function Get(note) {
 }
 
 function Post() {
-  let apiClient = new ApiClient(backend);
+  let apiClient = new ApiClient(BACKEND_URL);
   let defaultApi = new DefaultApi(apiClient);
-  let req = defaultApi.postApiV1Note({'note': note}, function (error, data, response) {
+  let req = defaultApi.postApiV1Note({'note': global_note}, function (error, data, response) {
     console.log(error, data, response)
     if(error != null) {
-      status.value = "failed";
+      global_status.value = "failed";
     } else {
-      status.value = "success";
+      global_status.value = "success";
     }
   });
 }
 
 function listNotes(data) {
-  note.startTime = data.format("YYYY-MM-DD")
-  note.endTime = data.format("YYYY-MM-DD")
-  let apiClient = new ApiClient(backend);
+  global_note.startTime = data.format("YYYY-MM-DD")
+  global_note.endTime = data.format("YYYY-MM-DD")
+  let apiClient = new ApiClient(BACKEND_URL);
   let defaultApi = new DefaultApi(apiClient);
-  let req = defaultApi.listApiV1Note({}, function (error, data, response) {
+
+  let ListReqStruct = new ListApiV1NoteRequest(global_note.startTime, global_note.endTime)
+  let request = {'listApiV1NoteRequest': ListReqStruct}
+
+  let req = defaultApi.listApiV1Note(request, function (error, data, response) {
     console.log(error, data, response)
-    notes = data;
+    global_notes = data;
   });
 }
 
@@ -112,19 +117,19 @@ function generateCalendar() {
     </ul>
   </div>
 </main>
-<Modal name="m1" v-model:visible="isVisible">
+<Modal title="Form" v-model:visible="isVisible">
   <ul class="ul-popup">
-    <template v-for="note in notes">
+    <template v-for="note in global_notes">
       <li>
         {{ JSON.stringify(note) }}
       </li>
     </template>
-    <input v-model="note.name" placeholder="name" /><br/>
-    <input v-model="note.description" placeholder="description" /><br/>
-    <input v-model="note.startTime" placeholder="start time" /><br/>
-    <input v-model="note.endTime" placeholder="end time" /><br/>
+    <input v-model="global_note.name" placeholder="name" /><br/>
+    <input v-model="global_note.description" placeholder="description" /><br/>
+    <input v-model="global_note.startTime" placeholder="start time" /><br/>
+    <input v-model="global_note.endTime" placeholder="end time" /><br/>
     <button v-on:click="Post()">Send data</button><br/>
-    {{ status }}
+    {{ global_status }}
   </ul>
 </Modal>
 </template>

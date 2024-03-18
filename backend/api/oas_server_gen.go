@@ -36,8 +36,8 @@ type Handler interface {
 	//
 	// Your GET endpoint.
 	//
-	// GET /api/v1/note
-	ListAPIV1Note(ctx context.Context, req OptNote) (ListAPIV1NoteRes, error)
+	// PATCH /api/v1/note
+	ListAPIV1Note(ctx context.Context, req OptListAPIV1NoteReq) (ListAPIV1NoteRes, error)
 	// PostAPIV1Note implements post-api-v1-note operation.
 	//
 	// Your POST endpoint.

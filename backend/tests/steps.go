@@ -190,6 +190,25 @@ func (fm *FeatureManager) StepDeleteNote(ctx context.Context, data *godog.DocStr
 	return ctx, nil
 }
 
+func (fm *FeatureManager) StepListNotes(ctx context.Context, start string, end string) (context.Context, error) {
+	client, err := api.NewClient(fmt.Sprintf("http://%s", fm.ip), []api.ClientOption{}...)
+	if err != nil {
+		return ctx, err
+	}
+
+	resp, err := client.ListAPIV1Note(ctx, api.NewOptListAPIV1NoteReq(api.ListAPIV1NoteReq{
+		StartTime: start,
+		EndTime:   end,
+	}))
+	if err != nil {
+		fm.lastResult = err
+	} else {
+		fm.lastResult = resp
+	}
+
+	return ctx, nil
+}
+
 func (fm *FeatureManager) StepGetUser(ctx context.Context, user string) (context.Context, error) {
 	client, err := api.NewClient(fmt.Sprintf("http://%s", fm.ip), []api.ClientOption{}...)
 	if err != nil {

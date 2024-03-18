@@ -13,6 +13,7 @@
 
 
 import ApiClient from "../ApiClient";
+import ListApiV1NoteRequest from '../model/ListApiV1NoteRequest';
 import Note from '../model/Note';
 import User from '../model/User';
 
@@ -206,13 +207,13 @@ export default class DefaultApi {
     /**
      * Your GET endpoint
      * @param {Object} opts Optional parameters
-     * @param {module:model/Note} [note] 
+     * @param {module:model/ListApiV1NoteRequest} [listApiV1NoteRequest] 
      * @param {module:api/DefaultApi~listApiV1NoteCallback} callback The callback function, accepting three arguments: error, data, response
      * data is of type: {@link Array.<module:model/Note>}
      */
     listApiV1Note(opts, callback) {
       opts = opts || {};
-      let postBody = opts['note'];
+      let postBody = opts['listApiV1NoteRequest'];
 
       let pathParams = {
       };
@@ -228,7 +229,7 @@ export default class DefaultApi {
       let accepts = ['application/json'];
       let returnType = [Note];
       return this.apiClient.callApi(
-        '/api/v1/note', 'GET',
+        '/api/v1/note', 'PATCH',
         pathParams, queryParams, headerParams, formParams, postBody,
         authNames, contentTypes, accepts, returnType, null, callback
       );

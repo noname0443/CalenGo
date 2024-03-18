@@ -448,11 +448,11 @@ func (s *Server) handleGetAPIV1UserRequest(args [1]string, argsEscaped bool, w h
 //
 // Your GET endpoint.
 //
-// GET /api/v1/note
+// PATCH /api/v1/note
 func (s *Server) handleListAPIV1NoteRequest(args [0]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("list-api-v1-note"),
-		semconv.HTTPMethodKey.String("GET"),
+		semconv.HTTPMethodKey.String("PATCH"),
 		semconv.HTTPRouteKey.String("/api/v1/note"),
 	}
 
@@ -515,7 +515,7 @@ func (s *Server) handleListAPIV1NoteRequest(args [0]string, argsEscaped bool, w 
 		}
 
 		type (
-			Request  = OptNote
+			Request  = OptListAPIV1NoteReq
 			Params   = struct{}
 			Response = ListAPIV1NoteRes
 		)

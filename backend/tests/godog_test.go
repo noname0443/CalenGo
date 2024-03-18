@@ -55,6 +55,7 @@ func InitializeScenario(fm *FeatureManager, sc *godog.ScenarioContext) {
 	sc.Step(`^I POST note /api/v1/note$`, fm.StepPostNote)
 	sc.Step(`^I PUT note /api/v1/note$`, fm.StepPutNote)
 	sc.Step(`^I DELETE note /api/v1/note$`, fm.StepDeleteNote)
+	sc.Step(`^I LIST notes >= ([^"]*) and <= ([^"]*)$`, fm.StepListNotes)
 
 	sc.Step(`^I GET user /api/v1/user/([^"]*)$`, fm.StepGetUser)
 	sc.Step(`^I POST user /api/v1/user$`, fm.StepPostUser)
