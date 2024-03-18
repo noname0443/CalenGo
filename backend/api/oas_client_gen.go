@@ -51,8 +51,8 @@ type Invoker interface {
 	//
 	// Your GET endpoint.
 	//
-	// GET /api/v1/note
-	ListAPIV1Note(ctx context.Context, request OptNote) (ListAPIV1NoteRes, error)
+	// PATCH /api/v1/note
+	ListAPIV1Note(ctx context.Context, request OptListAPIV1NoteReq) (ListAPIV1NoteRes, error)
 	// PostAPIV1Note invokes post-api-v1-note operation.
 	//
 	// Your POST endpoint.
@@ -461,16 +461,16 @@ func (c *Client) sendGetAPIV1User(ctx context.Context, params GetAPIV1UserParams
 //
 // Your GET endpoint.
 //
-// GET /api/v1/note
-func (c *Client) ListAPIV1Note(ctx context.Context, request OptNote) (ListAPIV1NoteRes, error) {
+// PATCH /api/v1/note
+func (c *Client) ListAPIV1Note(ctx context.Context, request OptListAPIV1NoteReq) (ListAPIV1NoteRes, error) {
 	res, err := c.sendListAPIV1Note(ctx, request)
 	return res, err
 }
 
-func (c *Client) sendListAPIV1Note(ctx context.Context, request OptNote) (res ListAPIV1NoteRes, err error) {
+func (c *Client) sendListAPIV1Note(ctx context.Context, request OptListAPIV1NoteReq) (res ListAPIV1NoteRes, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("list-api-v1-note"),
-		semconv.HTTPMethodKey.String("GET"),
+		semconv.HTTPMethodKey.String("PATCH"),
 		semconv.HTTPRouteKey.String("/api/v1/note"),
 	}
 
@@ -508,7 +508,7 @@ func (c *Client) sendListAPIV1Note(ctx context.Context, request OptNote) (res Li
 	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "GET", u)
+	r, err := ht.NewRequest(ctx, "PATCH", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}

@@ -150,7 +150,7 @@ func (s *Server) decodeDeleteAPIV1UserRequest(r *http.Request) (
 }
 
 func (s *Server) decodeListAPIV1NoteRequest(r *http.Request) (
-	req OptNote,
+	req OptListAPIV1NoteReq,
 	close func() error,
 	rerr error,
 ) {
@@ -192,7 +192,7 @@ func (s *Server) decodeListAPIV1NoteRequest(r *http.Request) (
 
 		d := jx.DecodeBytes(buf)
 
-		var request OptNote
+		var request OptListAPIV1NoteReq
 		if err := func() error {
 			request.Reset()
 			if err := request.Decode(d); err != nil {

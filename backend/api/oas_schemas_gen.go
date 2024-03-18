@@ -41,6 +41,31 @@ type ListAPIV1NoteOKApplicationJSON []Note
 
 func (*ListAPIV1NoteOKApplicationJSON) listAPIV1NoteRes() {}
 
+type ListAPIV1NoteReq struct {
+	StartTime string `json:"startTime"`
+	EndTime   string `json:"endTime"`
+}
+
+// GetStartTime returns the value of StartTime.
+func (s *ListAPIV1NoteReq) GetStartTime() string {
+	return s.StartTime
+}
+
+// GetEndTime returns the value of EndTime.
+func (s *ListAPIV1NoteReq) GetEndTime() string {
+	return s.EndTime
+}
+
+// SetStartTime sets the value of StartTime.
+func (s *ListAPIV1NoteReq) SetStartTime(val string) {
+	s.StartTime = val
+}
+
+// SetEndTime sets the value of EndTime.
+func (s *ListAPIV1NoteReq) SetEndTime(val string) {
+	s.EndTime = val
+}
+
 // Ref: #/components/schemas/Note
 type Note struct {
 	Name        string `json:"name" db:"name"`
@@ -90,6 +115,52 @@ func (s *Note) SetEndTime(val string) {
 }
 
 func (*Note) getAPIV1NoteRes() {}
+
+// NewOptListAPIV1NoteReq returns new OptListAPIV1NoteReq with value set to v.
+func NewOptListAPIV1NoteReq(v ListAPIV1NoteReq) OptListAPIV1NoteReq {
+	return OptListAPIV1NoteReq{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptListAPIV1NoteReq is optional ListAPIV1NoteReq.
+type OptListAPIV1NoteReq struct {
+	Value ListAPIV1NoteReq
+	Set   bool
+}
+
+// IsSet returns true if OptListAPIV1NoteReq was set.
+func (o OptListAPIV1NoteReq) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptListAPIV1NoteReq) Reset() {
+	var v ListAPIV1NoteReq
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptListAPIV1NoteReq) SetTo(v ListAPIV1NoteReq) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptListAPIV1NoteReq) Get() (v ListAPIV1NoteReq, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptListAPIV1NoteReq) Or(d ListAPIV1NoteReq) ListAPIV1NoteReq {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
 
 // NewOptNote returns new OptNote with value set to v.
 func NewOptNote(v Note) OptNote {

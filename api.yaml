@@ -1,6 +1,6 @@
 openapi: 3.1.0
 x-stoplight:
-  id: qqjvy7f5cwsjt
+  id: s21ydxptoex9m
 info:
   title: CalenGo
   version: '1.0'
@@ -21,7 +21,7 @@ paths:
           description: Bad Request
       operationId: get-api-v1-note
       x-stoplight:
-        id: 3j0zd6kypal3w
+        id: fa6zd7fjrs35m
       x-internal: false
       parameters:
         - name: note
@@ -40,7 +40,7 @@ paths:
           description: Bad Request
       operationId: post-api-v1-note
       x-stoplight:
-        id: iou7qiwhxy4bw
+        id: ynbna4m3bi2ma
       requestBody:
         content:
           application/json:
@@ -57,7 +57,7 @@ paths:
           description: Bad Request
       operationId: put-api-v1-note
       x-stoplight:
-        id: s5mnqtp3adtzr
+        id: egzqo8q5setts
       requestBody:
         content:
           application/json:
@@ -74,14 +74,14 @@ paths:
           description: Bad Request
       operationId: delete-api-v1-note
       x-stoplight:
-        id: 0ke1mek07w66y
+        id: 0gjmql7d2htgc
       requestBody:
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/Note'
       parameters: []
-    get:
+    patch:
       summary: Your GET endpoint
       tags: []
       responses:
@@ -94,17 +94,29 @@ paths:
                 items:
                   $ref: '#/components/schemas/Note'
                   x-stoplight:
-                    id: eyde7rw1bbur6
+                    id: mvxdfpzo8892p
         '400':
           description: Bad Request
       operationId: list-api-v1-note
       x-stoplight:
-        id: qdsnyli6beuy6
+        id: azrvdqq6c9xqd
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Note'
+              type: object
+              required:
+                - startTime
+                - endTime
+              properties:
+                startTime:
+                  type: string
+                  x-stoplight:
+                    id: vb158gbmhn66d
+                endTime:
+                  type: string
+                  x-stoplight:
+                    id: em4tjjewrzmkf
       parameters: []
   '/api/v1/user/{user}':
     get:
@@ -121,7 +133,7 @@ paths:
           description: Bad Request
       operationId: get-api-v1-user
       x-stoplight:
-        id: 54far6e9nxjya
+        id: 7fflcqjammzag
       x-internal: false
       parameters:
         - name: user
@@ -140,7 +152,7 @@ paths:
           description: Bad Request
       operationId: post-api-v1-user
       x-stoplight:
-        id: 1monbbbn7vn9z
+        id: z7nplxqgdtelp
       requestBody:
         content:
           application/json:
@@ -157,7 +169,7 @@ paths:
           description: Bad Request
       operationId: put-api-v1-user
       x-stoplight:
-        id: sgb9kuiww8xur
+        id: v84uzylocjaxp
       requestBody:
         content:
           application/json:
@@ -174,7 +186,7 @@ paths:
           description: Bad Request
       operationId: delete-api-v1-user
       x-stoplight:
-        id: sbwrijkjmj371
+        id: bbvig2ftzq81y
       requestBody:
         content:
           application/json:
@@ -186,16 +198,8 @@ components:
     User:
       title: User
       type: object
-      examples:
-        - id: 142
-          firstName: Alice
-          lastName: Smith
-          email: alice.smith@gmail.com
-          dateOfBirth: '1997-10-31'
-          emailVerified: true
-          signUpDate: '2019-08-24'
       x-stoplight:
-        id: 9iipnr1t27u9c
+        id: swrwx81j2i2o2
       required:
         - name
         - password
@@ -203,19 +207,19 @@ components:
         name:
           type: string
           x-stoplight:
-            id: cf351ofavnemz
+            id: s72fdbxfzcob4
           x-oapi-codegen-extra-tags:
             db: name
         password:
           type: string
           x-stoplight:
-            id: zaazstoax46tr
+            id: f8l8xaitkxw2u
           x-oapi-codegen-extra-tags:
             db: password
     Note:
       title: Note
       x-stoplight:
-        id: 44gq3bdi5b4jx
+        id: 7z9wkzkhwm467
       type: object
       required:
         - name
@@ -226,24 +230,24 @@ components:
         name:
           type: string
           x-stoplight:
-            id: fmp0y98emh7kp
+            id: uprfucq6w3d3v
           x-oapi-codegen-extra-tags:
             db: name
         description:
           type: string
           x-stoplight:
-            id: 6lriuybzrervs
+            id: k06q27mrrcruz
           x-oapi-codegen-extra-tags:
             db: description
         startTime:
           type: string
           x-stoplight:
-            id: h1nzksav66oul
+            id: tsmuwhlqpsmwm
           x-oapi-codegen-extra-tags:
             db: start_time
         endTime:
           type: string
           x-stoplight:
-            id: m8knttog2hy8f
+            id: dbtjlgmp2stud
           x-oapi-codegen-extra-tags:
             db: end_time

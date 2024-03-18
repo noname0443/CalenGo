@@ -52,7 +52,7 @@ func encodeDeleteAPIV1UserRequest(
 }
 
 func encodeListAPIV1NoteRequest(
-	req OptNote,
+	req OptListAPIV1NoteReq,
 	r *http.Request,
 ) error {
 	const contentType = "application/json"

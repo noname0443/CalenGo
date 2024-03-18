@@ -9,8 +9,8 @@ Feature: Start Server
         {
             "name": "note1",
             "description": "note1",
-            "startTime": "2009-01-01",
-            "endTime": "2009-01-05"
+            "startTime": "2009-01-02",
+            "endTime": "2009-01-04"
         }
         """
         Then I got no error
@@ -21,9 +21,34 @@ Feature: Start Server
         {
             "name": "note1",
             "description": "note1",
-            "startTime": "2009-01-01",
-            "endTime": "2009-01-05"
+            "startTime": "2009-01-02",
+            "endTime": "2009-01-04"
         }
+        """
+
+        When I LIST notes >= 2009-01-01 and <= 2009-01-05
+        Then I got data
+        """
+        [
+            {
+                "name": "note1",
+                "description": "note1",
+                "startTime": "2009-01-02",
+                "endTime": "2009-01-04"
+            }
+        ]
+        """
+        When I LIST notes >= 2009-01-02 and <= 2009-01-04
+        Then I got data
+        """
+        [
+            {
+                "name": "note1",
+                "description": "note1",
+                "startTime": "2009-01-02",
+                "endTime": "2009-01-04"
+            }
+        ]
         """
 
         When I PUT note /api/v1/note

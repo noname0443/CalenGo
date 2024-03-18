@@ -53,8 +53,8 @@ func (UnimplementedHandler) GetAPIV1User(ctx context.Context, params GetAPIV1Use
 //
 // Your GET endpoint.
 //
-// GET /api/v1/note
-func (UnimplementedHandler) ListAPIV1Note(ctx context.Context, req OptNote) (r ListAPIV1NoteRes, _ error) {
+// PATCH /api/v1/note
+func (UnimplementedHandler) ListAPIV1Note(ctx context.Context, req OptListAPIV1NoteReq) (r ListAPIV1NoteRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
