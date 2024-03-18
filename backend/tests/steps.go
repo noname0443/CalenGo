@@ -15,6 +15,7 @@ import (
 	"github.com/jmoiron/sqlx"
 	"github.com/noname0443/CalenGo/backend/api"
 	"github.com/noname0443/CalenGo/backend/internal"
+	"github.com/noname0443/CalenGo/backend/utility"
 )
 
 type FeatureManager struct {
@@ -77,7 +78,7 @@ func (fm *FeatureManager) StepStartServerOn(ctx context.Context, ip string) (con
 	}
 
 	var db *sqlx.DB
-	err = doRetry(func() error {
+	err = utility.DoRetry(func() error {
 		db, err = sqlx.Connect("mysql", "root:root@(localhost:15155)/sys")
 		if err != nil {
 			return err

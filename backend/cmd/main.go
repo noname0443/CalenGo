@@ -5,14 +5,22 @@ import (
 
 	"github.com/jmoiron/sqlx"
 	"github.com/noname0443/CalenGo/backend/internal"
+	"github.com/noname0443/CalenGo/backend/utility"
 
+	_ "github.com/go-sql-driver/mysql"
 	"github.com/sirupsen/logrus"
 )
 
 func main() {
 	initLogger(test)
 
-	db, err := sqlx.Connect("mysql", "root:root@(localhost:3306)/sys")
+	var db *sqlx.DB
+	var err error
+
+	err = utility.DoRetry(func() error {
+		db, err = sqlx.Connect("mysql", "root:root@(localhost:3306)/sys")
+		return err
+	})
 	if err != nil {
 		logrus.Fatal(err)
 	}
