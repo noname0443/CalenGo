@@ -18,9 +18,14 @@ func main() {
 	var err error
 
 	err = utility.DoRetry(func() error {
-		db, err = sqlx.Connect("mysql", "root:root@(localhost:3306)/sys")
+		db, err = sqlx.Connect("mysql", "root:root@(mysql:3306)/sys")
 		return err
 	})
+	if err != nil {
+		logrus.Fatal(err)
+	}
+	
+	err = utility.InitSQL(db)
 	if err != nil {
 		logrus.Fatal(err)
 	}

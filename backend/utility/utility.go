@@ -1,9 +1,12 @@
 package utility
 
 import (
+	"github.com/jmoiron/sqlx"
 	"math"
+	"os"
 	"time"
 
+	"strings"
 	"github.com/sirupsen/logrus"
 )
 
@@ -20,4 +23,23 @@ func DoRetry(function func() error) error {
 	}
 	logrus.Error("got while retry:", err.Error())
 	return err
+}
+
+func InitSQL(db *sqlx.DB) error {
+	filedata, err := os.ReadFile("../init-mysql.sql")
+	if err != nil {
+		return err
+	}
+
+	requests := strings.Split(string(filedata), ";")
+	for _, request := range requests {
+		if len(request) == 0 {
+			continue
+		}
+		_, err = db.Exec(request)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }

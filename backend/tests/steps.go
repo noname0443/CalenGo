@@ -5,9 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"os"
 	"reflect"
-	"strings"
 
 	"github.com/cucumber/godog"
 	docker "github.com/fsouza/go-dockerclient"
@@ -89,20 +87,9 @@ func (fm *FeatureManager) StepStartServerOn(ctx context.Context, ip string) (con
 		return ctx, err
 	}
 
-	filedata, err := os.ReadFile("../../init-mysql.sql")
+	err = utility.InitSQL(db)
 	if err != nil {
 		return ctx, err
-	}
-
-	requests := strings.Split(string(filedata), ";")
-	for _, request := range requests {
-		if len(request) == 0 {
-			continue
-		}
-		_, err = db.Exec(request)
-		if err != nil {
-			return ctx, err
-		}
 	}
 
 	app := internal.NewApp(ip, db)
