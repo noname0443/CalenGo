@@ -1,0 +1,46 @@
+version: "3.8"
+
+services:
+  mysql:
+    image: mysql
+    hostname: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - 3306
+    restart: always
+    networks:
+      test_net:
+        ipv4_address: 192.168.11.2
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+      interval: 20s
+      timeout: 30s
+      retries: 10
+
+  frontend:
+    build:
+      dockerfile: ./frontend/Dockerfile
+    hostname: frontend
+    ports:
+      - 5173
+    networks:
+      test_net:
+        ipv4_address: 192.168.11.3
+
+  backend:
+    build:
+      dockerfile: ./backend/Dockerfile
+    hostname: backend
+    networks:
+      test_net:
+        ipv4_address: 192.168.11.4
+
+networks:
+  test_net:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+       - subnet: 192.168.11.0/24
+         gateway: 192.168.11.1

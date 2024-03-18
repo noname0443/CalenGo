@@ -3,28 +3,11 @@ package tests
 import (
 	"fmt"
 	"io"
-	"math"
 	"net/http"
 	"strings"
-	"time"
 
-	"github.com/sirupsen/logrus"
+	"github.com/noname0443/CalenGo/backend/utility"
 )
-
-const RETRY_COUNT = 8
-
-func doRetry(function func() error) error {
-	var err error
-	for i := 0; i < RETRY_COUNT; i++ {
-		err = function()
-		if err == nil {
-			return nil
-		}
-		time.Sleep(time.Second * time.Duration(math.Pow(2.0, float64(i))))
-	}
-	logrus.Error("got while retry:", err.Error())
-	return err
-}
 
 func Get(ip string) error {
 	resp, err := http.Get(fmt.Sprintf("http://%s/", ip))
@@ -41,7 +24,7 @@ func Get(ip string) error {
 }
 
 func checkServerIsWorking(ip string) error {
-	return doRetry(func() error {
+	return utility.DoRetry(func() error {
 		resp, err := http.Get(fmt.Sprintf("http://%s/", ip))
 		if err != nil {
 			return err
