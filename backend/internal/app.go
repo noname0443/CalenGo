@@ -31,7 +31,8 @@ func (app *App) Run() {
 	c := cors.New(cors.Options{
 		AllowedOrigins:   []string{"*"},
 		AllowCredentials: true,
-		AllowedHeaders:   []string{"User-Agent"},
+		Debug:            true,
+		AllowedHeaders:   []string{"User-Agent", "Content-Type"},
 	})
 
 	logrus.Info("Server starting!")

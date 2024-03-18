@@ -23,7 +23,7 @@ services:
       dockerfile: ./frontend/Dockerfile
     hostname: frontend
     ports:
-      - 5173
+      - 5173:5173
     networks:
       test_net:
         ipv4_address: 192.168.11.3
@@ -32,6 +32,8 @@ services:
     build:
       dockerfile: ./backend/Dockerfile
     hostname: backend
+    ports:
+      - 1516:1516
     networks:
       test_net:
         ipv4_address: 192.168.11.4

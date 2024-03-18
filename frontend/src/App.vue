@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue';
+import { reactive, ref } from 'vue';
 import moment from 'moment';
 const count = ref(0)
 
@@ -11,12 +11,46 @@ import { Modal } from 'usemodal-vue3';
 
 let isVisible = ref(false);
 let counter = 1;
+let backend = 'http://localhost:1516'
+let notes = reactive([])
+let status = ref("nothing");
 
-function Send() {
-  let apiClient = new ApiClient('http://localhost:1516');
+let note = {
+  name: '',
+  description: '',
+  startTime: '',
+  endTime: ''
+};
+
+function Get(note) {
+  let apiClient = new ApiClient(backend);
   let xxxSvc = new DefaultApi(apiClient);
-  let zzz = xxxSvc.getApiV1Note('1', function (error, data, response) {
+  let zzz = xxxSvc.getApiV1Note(note, function (error, data, response) {
     console.log(error, data, response)
+  });
+}
+
+function Post() {
+  let apiClient = new ApiClient(backend);
+  let defaultApi = new DefaultApi(apiClient);
+  let req = defaultApi.postApiV1Note({'note': note}, function (error, data, response) {
+    console.log(error, data, response)
+    if(error != null) {
+      status.value = "failed";
+    } else {
+      status.value = "success";
+    }
+  });
+}
+
+function listNotes(data) {
+  note.startTime = data.format("YYYY-MM-DD")
+  note.endTime = data.format("YYYY-MM-DD")
+  let apiClient = new ApiClient(backend);
+  let defaultApi = new DefaultApi(apiClient);
+  let req = defaultApi.listApiV1Note({}, function (error, data, response) {
+    console.log(error, data, response)
+    notes = data;
   });
 }
 
@@ -66,20 +100,32 @@ function generateCalendar() {
     <ul class="days">
       <template v-for="day in generateCalendar(2024, 3)">
         <li v-if="day.isSame(new Date(), 'day') && counter++">
-          <span v-on:click="isVisible = !isVisible" class="active">{{ day.format('D') }}</span>
+          <span v-on:click="listNotes(day.clone()); isVisible = !isVisible;" class="active">{{ day.format('D') }}</span>
         </li>
         <li v-else-if="counter % 2 === 0 && counter++">
-          <p v-on:click="isVisible = !isVisible">{{ day.format('D') }}</p>
+          <p v-on:click="listNotes(day.clone()); isVisible = !isVisible;">{{ day.format('D') }}</p>
         </li>
         <li v-else-if="counter++">
-          <p v-on:click="isVisible = !isVisible" class="grayClass">{{ day.format('D') }}</p>
+          <p v-on:click="listNotes(day.clone()); isVisible = !isVisible;" class="grayClass">{{ day.format('D') }}</p>
         </li>
       </template>
     </ul>
   </div>
 </main>
-<Modal v-model:visible="isVisible">
-  <div>your content...</div>
+<Modal name="m1" v-model:visible="isVisible">
+  <ul class="ul-popup">
+    <template v-for="note in notes">
+      <li>
+        {{ JSON.stringify(note) }}
+      </li>
+    </template>
+    <input v-model="note.name" placeholder="name" /><br/>
+    <input v-model="note.description" placeholder="description" /><br/>
+    <input v-model="note.startTime" placeholder="start time" /><br/>
+    <input v-model="note.endTime" placeholder="end time" /><br/>
+    <button v-on:click="Post()">Send data</button><br/>
+    {{ status }}
+  </ul>
 </Modal>
 </template>
 <style scoped>
@@ -117,6 +163,10 @@ ul {
   list-style-type: none;
 }
 body {font-family: Verdana, sans-serif;}
+
+.ul-popup {
+  list-style-type: decimal;
+}
 
 /* Month header */
 .month {
