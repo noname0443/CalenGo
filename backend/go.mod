@@ -9,7 +9,7 @@ require (
 	github.com/fsouza/go-dockerclient v1.11.0
 	github.com/go-faster/errors v0.7.1
 	github.com/go-faster/jx v1.1.0
-	github.com/go-sql-driver/mysql v1.6.0
+	github.com/go-sql-driver/mysql v1.8.0
 	github.com/jmoiron/sqlx v1.3.5
 	github.com/ogen-go/ogen v1.0.0
 	github.com/rs/cors v1.10.1
@@ -21,6 +21,7 @@ require (
 )
 
 require (
+	filippo.io/edwards25519 v1.1.0 // indirect
 	github.com/Azure/go-ansiterm v0.0.0-20210617225240-d185dfc1b5a1 // indirect
 	github.com/Microsoft/go-winio v0.6.1 // indirect
 	github.com/containerd/containerd v1.6.26 // indirect
