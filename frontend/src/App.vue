@@ -2,11 +2,13 @@
 import { reactive, ref, toRaw } from 'vue';
 import moment from 'moment';
 
+import "./assets/form-app.css";
 import ApiClient from './api/ApiClient';
 import DefaultApi from './api/api/DefaultApi';
 import { Modal } from 'usemodal-vue3';
 import ListApiV1NoteRequest from './api/model/ListApiV1NoteRequest'
 import { CSpinner } from '@coreui/vue'
+import { Collapse } from 'vue-collapsed'
 
 moment.updateLocale('en', {
   week: {
@@ -23,7 +25,7 @@ let isWarningMessage = ref(false);
 let MONTH_FROM_CHRIST = ref(moment().year() * 12 + moment().month())
 
 let BACKEND_URL = 'http://localhost:1516'
-let global_notes = ref([])
+let global_notes = reactive([])
 let global_status = ref("nothing");
 let DatesArray = [];
 
@@ -115,6 +117,7 @@ function Post() {
     } else {
       global_status.value = "Success";
     }
+    listNotes(moment(global_note.startTime), moment(global_note.endTime))
   });
 }
 
@@ -132,7 +135,12 @@ function listNotes(start, end) {
 
   let req = defaultApi.listApiV1Note(request, function (error, data, response) {
     console.log(error, data, response)
-    global_notes = data;
+    data.forEach(function (element) {
+      element.collapse = false;
+    });
+    global_notes.length = 0;
+    global_notes.push(...data);
+    console.log(global_notes)
   });
 }
 
@@ -203,14 +211,30 @@ function generateCalendar(month_from_christ) {
 
 <Modal title="Notes Window" width="70%" v-model:visible="isVisible" :okButton="{text: 'ok', onclick: () => {isWarningMessage = true; global_status = 'Loading...'; Post()}, loading: false}">
   <ul class="ul-popup">
-    <input v-model="global_note.name" placeholder="name" /><br/>
-    <textarea v-model="global_note.description" placeholder="description" /><br/>
-    <input v-model="global_note.startTime" placeholder="start time" /><br/>
-    <input v-model="global_note.endTime" value="{{global_note.endTime}}" placeholder="end time" /><br/>
-    <button v-on:click="">Send data</button><br/>
-    <li v-for="note in global_notes">
-      {{ JSON.stringify(note) }}
-    </li>
+    <form class="form-signin">
+      <h2 class="form-signin-heading">Create Note</h2>
+      <input type="text" class="form-control" v-model="global_note.name" placeholder="name" />
+      <textarea rows="8" class="form-textarea" v-model="global_note.description" placeholder="description"/>
+      <input type="text" class="form-control" v-model="global_note.startTime" placeholder="start time" />
+      <input type="text" class="form-control" v-model="global_note.endTime" value="{{global_note.endTime}}" placeholder="end time" />
+    </form>
+    <div v-for="(note, index) in global_notes" style="padding-top: 15px;">
+      <h2 @click="global_notes[index].collapse = !global_notes[index].collapse" class="form-signin">
+        <template v-if="!global_notes[index].collapse">
+          + {{ note.name }}
+        </template>
+        <template v-else>
+          - {{ note.name }}
+        </template>
+      </h2>
+      <Collapse :when="global_notes[index].collapse">
+        <form class="form-signin">
+          <textarea disabled="disabled" rows="8" class="form-textarea" v-bind:value="note.description" placeholder="description"/>
+          <input disabled="disabled" type="text" class="form-control" v-bind:value="note.startTime" placeholder="start time"/>
+          <input disabled="disabled" type="text" class="form-control" v-bind:value="note.endTime" placeholder="end time" />
+        </form>
+      </Collapse>
+    </div>
   </ul>
 </Modal>
   <Modal title="Status Window" width="40%" v-model:visible="isWarningMessage" :okButton="{text: 'ok', onclick: () => {isWarningMessage = false}}">
@@ -362,5 +386,10 @@ body {font-family: Verdana, sans-serif;}
   -ms-user-select: none; /* IE 10 and IE 11 */
   user-select: none; /* Standard syntax */
   cursor: pointer;
+}
+
+.v-collapse {
+  transition: height 300ms ease-out;
+  /* or transition: height var(--vc-auto-duration) ease-in-out */
 }
 </style>
