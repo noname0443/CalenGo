@@ -34,6 +34,12 @@ let global_note = reactive({
   endTime: ''
 });
 
+function DoStartSelection(num) {
+  StartSelection._value = num;
+  EndSelection._value = num;
+  ChangeColor()
+}
+
 function ChangeColor() {
   removeColor()
   console.log(StartSelection._value, EndSelection._value)
@@ -61,6 +67,9 @@ function removeColor() {
 }
 
 function UnChangeColor() {
+  if(EndSelection._value == -1 || StartSelection._value == -1) {
+    return
+  }
   isVisible.value = true
   listNotes(DatesArray[StartSelection._value], DatesArray[EndSelection._value])
   console.log(isVisible)
@@ -71,7 +80,9 @@ function UnChangeColor() {
 
 window.addEventListener('mouseup', function(e) {
   e.preventDefault()
-  UnChangeColor()
+  removeColor()
+  StartSelection._value = -1;
+  EndSelection._value = -1;
 }, false);
 
 function getMonthString(month_from_christ) {
@@ -157,8 +168,8 @@ function generateCalendar(month_from_christ) {
 <main>
   <div class="month">
     <ul>
-      <li class="prev" v-on:click="MONTH_FROM_CHRIST--">&#10094;</li>
-      <li class="next" v-on:click="MONTH_FROM_CHRIST++">&#10095;</li>
+      <li class="prev prevent-select" v-on:click="MONTH_FROM_CHRIST--">&#10094;</li>
+      <li class="next prevent-select" v-on:click="MONTH_FROM_CHRIST++">&#10095;</li>
       <li>{{ getMonthString(MONTH_FROM_CHRIST) }}<br><span style="font-size:18px">{{ getYearString(MONTH_FROM_CHRIST) }}</span></li>
     </ul>
   </div>
@@ -176,13 +187,13 @@ function generateCalendar(month_from_christ) {
 
     <ul class="days">
       <template v-for="[i, day] in generateCalendar(MONTH_FROM_CHRIST).entries()">
-        <li v-if="day.isSame(new Date(), 'day')" :id="['i' + i]" v-on:mousedown="StartSelection = i" v-on:mouseenter="EndSelection=i;ChangeColor()">
+        <li v-if="day.isSame(new Date(), 'day')" :id="['i' + i]" v-on:mouseup="UnChangeColor()" v-on:mousedown="DoStartSelection(i)" v-on:mouseenter="EndSelection=i;ChangeColor()">
           <p class="active prevent-select">{{ day.format('D') }}</p>
         </li>
-        <li v-else-if="i % 2 === 0" :id="['i' + i]" v-on:mousedown="StartSelection = i" v-on:mouseenter="EndSelection=i;ChangeColor()">
+        <li v-else-if="i % 2 === 0" :id="['i' + i]" v-on:mouseup="UnChangeColor()" v-on:mousedown="DoStartSelection(i)" v-on:mouseenter="EndSelection=i;ChangeColor()">
           <p class="prevent-select">{{ day.format('D') }}</p>
         </li>
-        <li v-else :id="['i' + i]" v-on:mousedown="StartSelection = i" v-on:mouseenter="EndSelection=i;ChangeColor()">
+        <li v-else :id="['i' + i]" v-on:mouseup="UnChangeColor()" v-on:mousedown="DoStartSelection(i)" v-on:mouseenter="EndSelection=i;ChangeColor()">
           <p class="grayBackground prevent-select">{{ day.format('D') }}</p>
         </li>
       </template>
@@ -350,5 +361,6 @@ body {font-family: Verdana, sans-serif;}
   -webkit-user-select: none; /* Safari */
   -ms-user-select: none; /* IE 10 and IE 11 */
   user-select: none; /* Standard syntax */
+  cursor: pointer;
 }
 </style>
