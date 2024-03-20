@@ -1,27 +1,101 @@
 <script setup>
-import { reactive, ref } from 'vue';
+import { reactive, ref, toRaw } from 'vue';
 import moment from 'moment';
-const count = ref(0)
 
 import ApiClient from './api/ApiClient';
-import Note from './api/model/Note';
-import User from './api/model/User';
 import DefaultApi from './api/api/DefaultApi';
 import { Modal } from 'usemodal-vue3';
-import ListApiV1NoteRequest from './api/model/ListApiV1NoteRequest';
+import ListApiV1NoteRequest from './api/model/ListApiV1NoteRequest'
+import { CSpinner } from '@coreui/vue'
+
+moment.updateLocale('en', {
+  week: {
+    dow : 1,
+  }
+});
+
+let StartSelection = ref(-1);
+let EndSelection = ref(-1);
 
 let isVisible = ref(false);
-let counter = 1;
-let BACKEND_URL = 'http://localhost:1516'
-let global_notes = reactive([])
-let global_status = ref("nothing");
+let isWarningMessage = ref(false);
 
-let global_note = {
+let MONTH_FROM_CHRIST = ref(moment().year() * 12 + moment().month())
+
+let BACKEND_URL = 'http://localhost:1516'
+let global_notes = ref([])
+let global_status = ref("nothing");
+let DatesArray = [];
+
+let global_note = reactive({
   name: '',
   description: '',
   startTime: '',
   endTime: ''
-};
+});
+
+function DoStartSelection(num) {
+  StartSelection._value = num;
+  EndSelection._value = num;
+  ChangeColor()
+}
+
+function ChangeColor() {
+  removeColor()
+  console.log(StartSelection._value, EndSelection._value)
+  if(EndSelection._value == -1 || StartSelection._value == -1) {
+    return
+  }
+  let start = StartSelection._value;
+  let end = EndSelection._value;
+  if(end < start) {
+    let tmp = end;
+    end = start;
+    start = tmp;
+  }
+  for(let i = start; i <= end; i++) {
+    document.getElementById(`i${i}`).getElementsByTagName('p')[0].style.background = 'rgba(62, 155, 141, 0.3)';
+    document.getElementById(`i${i}`).getElementsByTagName('p')[0].style.color = 'black';
+  }
+}
+
+function removeColor() {
+  for(let i = 0; i <= 60; i++) {
+    if (document.getElementById(`i${i}`) !== null)
+      document.getElementById(`i${i}`).getElementsByTagName('p')[0].style = '';
+  }
+}
+
+function UnChangeColor() {
+  if(EndSelection._value == -1 || StartSelection._value == -1) {
+    return
+  }
+  isVisible.value = true
+  listNotes(DatesArray[StartSelection._value], DatesArray[EndSelection._value])
+  console.log(isVisible)
+  removeColor()
+  StartSelection._value = -1;
+  EndSelection._value = -1;
+}
+
+window.addEventListener('mouseup', function(e) {
+  e.preventDefault()
+  removeColor()
+  StartSelection._value = -1;
+  EndSelection._value = -1;
+}, false);
+
+function getMonthString(month_from_christ) {
+  let year = month_from_christ / 12
+  let month = month_from_christ % 12 + 1
+  return moment(`${year}-${month}-01`, 'YYYY-M-D').format('MMMM')
+}
+
+function getYearString(month_from_christ) {
+  let year = month_from_christ / 12
+  let month = month_from_christ % 12 + 1
+  return moment(`${year}-${month}-01`, 'YYYY-M-D').format('YYYY')
+}
 
 function Get(note) {
   let apiClient = new ApiClient(BACKEND_URL);
@@ -37,16 +111,19 @@ function Post() {
   let req = defaultApi.postApiV1Note({'note': global_note}, function (error, data, response) {
     console.log(error, data, response)
     if(error != null) {
-      global_status.value = "failed";
+      global_status.value = "Failed: " + error;
     } else {
-      global_status.value = "success";
+      global_status.value = "Success";
     }
   });
 }
 
-function listNotes(data) {
-  global_note.startTime = data.format("YYYY-MM-DD")
-  global_note.endTime = data.format("YYYY-MM-DD")
+function listNotes(start, end) {
+  if(start === undefined || end === undefined) {
+    return
+  }
+  global_note.startTime = start.format("YYYY-MM-DD")
+  global_note.endTime = end.format("YYYY-MM-DD")
   let apiClient = new ApiClient(BACKEND_URL);
   let defaultApi = new DefaultApi(apiClient);
 
@@ -59,14 +136,18 @@ function listNotes(data) {
   });
 }
 
-function generateCalendar() {
-  counter = 1;
-  const startDay = moment().startOf('month').startOf('week');
-  const endDay = moment().endOf('month').endOf('week');
-  let currentMonth = moment().month();
+function generateCalendar(month_from_christ) {
+  let year = month_from_christ / 12
+  let month = month_from_christ % 12 + 1
+  
+  let date = moment(`${year}-${month}-01`, 'YYYY-MM-DD')
+  
+  const startDay = date.clone().startOf('month').startOf('week');
+  const endDay = date.clone().endOf('month').endOf('week');
+  let currentMonth = date.clone().month();
   
   let calendar = [];
-  let index = startDay.clone();
+  let index = startDay.clone().subtract(1, 'day');
   while (index.isBefore(endDay, 'day')) {
     let arr = new Array(7).fill(0).map(function(n, i) {
       return index.add(1, 'day').clone();
@@ -78,6 +159,7 @@ function generateCalendar() {
       }
     }
   }
+  DatesArray = calendar;
   return calendar;
 }
 </script>
@@ -86,11 +168,12 @@ function generateCalendar() {
 <main>
   <div class="month">
     <ul>
-      <li class="prev">&#10094;</li>
-      <li class="next">&#10095;</li>
-      <li>{{ moment().format('MMMM') }}<br><span style="font-size:18px">{{ moment().format('YYYY') }}</span></li>
+      <li class="prev prevent-select" v-on:click="MONTH_FROM_CHRIST--">&#10094;</li>
+      <li class="next prevent-select" v-on:click="MONTH_FROM_CHRIST++">&#10095;</li>
+      <li>{{ getMonthString(MONTH_FROM_CHRIST) }}<br><span style="font-size:18px">{{ getYearString(MONTH_FROM_CHRIST) }}</span></li>
     </ul>
   </div>
+  
   <div class="days-view">
     <ul class="weekdays">
       <li>Monday</li>
@@ -103,35 +186,36 @@ function generateCalendar() {
     </ul>
 
     <ul class="days">
-      <template v-for="day in generateCalendar(2024, 3)">
-        <li v-if="day.isSame(new Date(), 'day') && counter++">
-          <span v-on:click="listNotes(day.clone()); isVisible = !isVisible;" class="active">{{ day.format('D') }}</span>
+      <template v-for="[i, day] in generateCalendar(MONTH_FROM_CHRIST).entries()">
+        <li v-if="day.isSame(new Date(), 'day')" :id="['i' + i]" v-on:mouseup="UnChangeColor()" v-on:mousedown="DoStartSelection(i)" v-on:mouseenter="EndSelection=i;ChangeColor()">
+          <p class="active prevent-select">{{ day.format('D') }}</p>
         </li>
-        <li v-else-if="counter % 2 === 0 && counter++">
-          <p v-on:click="listNotes(day.clone()); isVisible = !isVisible;">{{ day.format('D') }}</p>
+        <li v-else-if="i % 2 === 0" :id="['i' + i]" v-on:mouseup="UnChangeColor()" v-on:mousedown="DoStartSelection(i)" v-on:mouseenter="EndSelection=i;ChangeColor()">
+          <p class="prevent-select">{{ day.format('D') }}</p>
         </li>
-        <li v-else-if="counter++">
-          <p v-on:click="listNotes(day.clone()); isVisible = !isVisible;" class="grayClass">{{ day.format('D') }}</p>
+        <li v-else :id="['i' + i]" v-on:mouseup="UnChangeColor()" v-on:mousedown="DoStartSelection(i)" v-on:mouseenter="EndSelection=i;ChangeColor()">
+          <p class="grayBackground prevent-select">{{ day.format('D') }}</p>
         </li>
       </template>
     </ul>
   </div>
 </main>
-<Modal title="Form" v-model:visible="isVisible">
+
+<Modal title="Notes Window" width="70%" v-model:visible="isVisible" :okButton="{text: 'ok', onclick: () => {isWarningMessage = true; global_status = 'Loading...'; Post()}, loading: false}">
   <ul class="ul-popup">
-    <template v-for="note in global_notes">
-      <li>
-        {{ JSON.stringify(note) }}
-      </li>
-    </template>
     <input v-model="global_note.name" placeholder="name" /><br/>
-    <input v-model="global_note.description" placeholder="description" /><br/>
+    <textarea v-model="global_note.description" placeholder="description" /><br/>
     <input v-model="global_note.startTime" placeholder="start time" /><br/>
-    <input v-model="global_note.endTime" placeholder="end time" /><br/>
-    <button v-on:click="Post()">Send data</button><br/>
-    {{ global_status }}
+    <input v-model="global_note.endTime" value="{{global_note.endTime}}" placeholder="end time" /><br/>
+    <button v-on:click="">Send data</button><br/>
+    <li v-for="note in global_notes">
+      {{ JSON.stringify(note) }}
+    </li>
   </ul>
 </Modal>
+  <Modal title="Status Window" width="40%" v-model:visible="isWarningMessage" :okButton="{text: 'ok', onclick: () => {isWarningMessage = false}}">
+    {{ global_status }}
+  </Modal>
 </template>
 <style scoped>
 div {
@@ -252,7 +336,7 @@ body {font-family: Verdana, sans-serif;}
   flex-direction: column;
   justify-content: center;
   height: 100%;
-  color: black !important
+  color: black
 }
 
 .days li span {
@@ -262,14 +346,21 @@ body {font-family: Verdana, sans-serif;}
   height: 100%;
 }
 
-.grayClass {
-  background: #e5e5e5 !important
+.grayBackground {
+  background: #e5e5e5;
 }
 
 /* Highlight the "current" day */
 .days li .active {
   padding: 5px;
   background: #1abc9c;
-  color: white !important
+  color: white
+}
+
+.prevent-select {
+  -webkit-user-select: none; /* Safari */
+  -ms-user-select: none; /* IE 10 and IE 11 */
+  user-select: none; /* Standard syntax */
+  cursor: pointer;
 }
 </style>
