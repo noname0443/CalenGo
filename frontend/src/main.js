@@ -1,6 +1,30 @@
-import './assets/main.css'
+import { createMemoryHistory, createRouter } from 'vue-router'
+import Vue, { createApp } from '@vue/compat';
+import { BootstrapVue, IconsPlugin } from 'bootstrap-vue';
 
-import { createApp, ref } from 'vue'
+Vue.use(BootstrapVue)
+Vue.use(IconsPlugin)
+
+import './assets/base.css'
+import 'bootstrap/dist/css/bootstrap.css'
+import 'bootstrap-vue/dist/bootstrap-vue.css'
+
+import Calendar from './Calendar.vue'
+import Register from './Register.vue'
 import App from './App.vue'
+import Main from './Main.vue'
 
-const app = createApp(App).mount("#app")
+const routes = [
+    { path: '/', component: Main, name: 'Main' },
+    { path: '/register', component: Register, name: 'Register' },
+    { path: '/calendar', component: Calendar, name: 'Calendar' },
+]
+  
+const router = createRouter({
+    history: createMemoryHistory(),
+    routes,
+})
+
+const app = createApp(App);
+app.use(router);
+app.mount("#app");

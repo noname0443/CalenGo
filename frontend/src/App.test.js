@@ -1,5 +1,5 @@
 import { render } from '@testing-library/vue'
-import App from './App.vue'
+import Calendar from './Calendar.vue'
 
 test('it should work', () => {
   const { getByText } = render(App, {
