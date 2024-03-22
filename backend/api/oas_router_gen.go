@@ -73,14 +73,14 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 					switch r.Method {
 					case "DELETE":
 						s.handleDeleteAPIV1NoteRequest([0]string{}, elemIsEscaped, w, r)
-					case "PATCH":
+					case "GET":
 						s.handleListAPIV1NoteRequest([0]string{}, elemIsEscaped, w, r)
 					case "POST":
 						s.handlePostAPIV1NoteRequest([0]string{}, elemIsEscaped, w, r)
 					case "PUT":
 						s.handlePutAPIV1NoteRequest([0]string{}, elemIsEscaped, w, r)
 					default:
-						s.notAllowed(w, r, "DELETE,PATCH,POST,PUT")
+						s.notAllowed(w, r, "DELETE,GET,POST,PUT")
 					}
 
 					return
@@ -284,7 +284,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 						r.args = args
 						r.count = 0
 						return r, true
-					case "PATCH":
+					case "GET":
 						r.name = "ListAPIV1Note"
 						r.summary = "Your GET endpoint"
 						r.operationID = "list-api-v1-note"

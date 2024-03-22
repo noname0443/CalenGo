@@ -13,13 +13,13 @@ type Handler interface {
 	// Your POST endpoint.
 	//
 	// DELETE /api/v1/note
-	DeleteAPIV1Note(ctx context.Context, req OptNote) (DeleteAPIV1NoteRes, error)
+	DeleteAPIV1Note(ctx context.Context, req OptNote, params DeleteAPIV1NoteParams) (DeleteAPIV1NoteRes, error)
 	// DeleteAPIV1User implements delete-api-v1-user operation.
 	//
 	// Your POST endpoint.
 	//
 	// DELETE /api/v1/user
-	DeleteAPIV1User(ctx context.Context, req OptUser) (DeleteAPIV1UserRes, error)
+	DeleteAPIV1User(ctx context.Context, req OptUser, params DeleteAPIV1UserParams) (DeleteAPIV1UserRes, error)
 	// GetAPIV1Note implements get-api-v1-note operation.
 	//
 	// Your GET endpoint.
@@ -36,14 +36,14 @@ type Handler interface {
 	//
 	// Your GET endpoint.
 	//
-	// PATCH /api/v1/note
-	ListAPIV1Note(ctx context.Context, req OptListAPIV1NoteReq) (ListAPIV1NoteRes, error)
+	// GET /api/v1/note
+	ListAPIV1Note(ctx context.Context, req OptListAPIV1NoteReq, params ListAPIV1NoteParams) (ListAPIV1NoteRes, error)
 	// PostAPIV1Note implements post-api-v1-note operation.
 	//
 	// Your POST endpoint.
 	//
 	// POST /api/v1/note
-	PostAPIV1Note(ctx context.Context, req OptNote) (PostAPIV1NoteRes, error)
+	PostAPIV1Note(ctx context.Context, req OptNote, params PostAPIV1NoteParams) (PostAPIV1NoteRes, error)
 	// PostAPIV1User implements post-api-v1-user operation.
 	//
 	// Your POST endpoint.
@@ -55,13 +55,13 @@ type Handler interface {
 	// Your POST endpoint.
 	//
 	// PUT /api/v1/note
-	PutAPIV1Note(ctx context.Context, req OptNote) (PutAPIV1NoteRes, error)
+	PutAPIV1Note(ctx context.Context, req OptNote, params PutAPIV1NoteParams) (PutAPIV1NoteRes, error)
 	// PutAPIV1User implements put-api-v1-user operation.
 	//
 	// Your POST endpoint.
 	//
 	// PUT /api/v1/user
-	PutAPIV1User(ctx context.Context, req OptUser) (PutAPIV1UserRes, error)
+	PutAPIV1User(ctx context.Context, req OptUser, params PutAPIV1UserParams) (PutAPIV1UserRes, error)
 }
 
 // Server implements http server based on OpenAPI v3 specification and

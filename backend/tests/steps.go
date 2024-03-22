@@ -18,6 +18,7 @@ import (
 
 type FeatureManager struct {
 	lastResult   interface{}
+	Credentials  string
 	ip           string
 	DockerClient *docker.Client
 }
@@ -106,6 +107,11 @@ func (fm *FeatureManager) StepIsWorkingOn(ctx context.Context) (context.Context,
 	return ctx, nil
 }
 
+func (fm *FeatureManager) StepSetCredentials(ctx context.Context, credentials string) (context.Context, error) {
+	fm.Credentials = credentials
+	return ctx, nil
+}
+
 func (fm *FeatureManager) StepGetNote(ctx context.Context, note string) (context.Context, error) {
 	client, err := api.NewClient(fmt.Sprintf("http://%s", fm.ip), []api.ClientOption{}...)
 	if err != nil {
@@ -136,7 +142,9 @@ func (fm *FeatureManager) StepPostNote(ctx context.Context, data *godog.DocStrin
 		return ctx, err
 	}
 
-	resp, err := client.PostAPIV1Note(ctx, api.NewOptNote(note))
+	resp, err := client.PostAPIV1Note(ctx, api.NewOptNote(note), api.PostAPIV1NoteParams{
+		Credentials: fm.Credentials,
+	})
 	if err != nil {
 		fm.lastResult = err
 	} else {
@@ -158,7 +166,9 @@ func (fm *FeatureManager) StepPutNote(ctx context.Context, data *godog.DocString
 		return ctx, err
 	}
 
-	resp, err := client.PutAPIV1Note(ctx, api.NewOptNote(note))
+	resp, err := client.PutAPIV1Note(ctx, api.NewOptNote(note), api.PutAPIV1NoteParams{
+		Credentials: fm.Credentials,
+	})
 	if err != nil {
 		fm.lastResult = err
 	} else {
@@ -180,7 +190,9 @@ func (fm *FeatureManager) StepDeleteNote(ctx context.Context, data *godog.DocStr
 		return ctx, err
 	}
 
-	resp, err := client.DeleteAPIV1Note(ctx, api.NewOptNote(note))
+	resp, err := client.DeleteAPIV1Note(ctx, api.NewOptNote(note), api.DeleteAPIV1NoteParams{
+		Credentials: fm.Credentials,
+	})
 	if err != nil {
 		fm.lastResult = err
 	} else {
@@ -199,7 +211,9 @@ func (fm *FeatureManager) StepListNotes(ctx context.Context, start string, end s
 	resp, err := client.ListAPIV1Note(ctx, api.NewOptListAPIV1NoteReq(api.ListAPIV1NoteReq{
 		StartTime: start,
 		EndTime:   end,
-	}))
+	}), api.ListAPIV1NoteParams{
+		Credentials: fm.Credentials,
+	})
 	if err != nil {
 		fm.lastResult = err
 	} else {
@@ -216,7 +230,8 @@ func (fm *FeatureManager) StepGetUser(ctx context.Context, user string) (context
 	}
 
 	resp, err := client.GetAPIV1User(ctx, api.GetAPIV1UserParams{
-		User: user,
+		User:        user,
+		Credentials: fm.Credentials,
 	})
 	if err != nil {
 		fm.lastResult = err
@@ -261,7 +276,9 @@ func (fm *FeatureManager) StepPutUser(ctx context.Context, data *godog.DocString
 		return ctx, err
 	}
 
-	resp, err := client.PutAPIV1User(ctx, api.NewOptUser(user))
+	resp, err := client.PutAPIV1User(ctx, api.NewOptUser(user), api.PutAPIV1UserParams{
+		Credentials: fm.Credentials,
+	})
 	if err != nil {
 		fm.lastResult = err
 	} else {
@@ -283,7 +300,9 @@ func (fm *FeatureManager) StepDeleteUser(ctx context.Context, data *godog.DocStr
 		return ctx, err
 	}
 
-	resp, err := client.DeleteAPIV1User(ctx, api.NewOptUser(user))
+	resp, err := client.DeleteAPIV1User(ctx, api.NewOptUser(user), api.DeleteAPIV1UserParams{
+		Credentials: fm.Credentials,
+	})
 	if err != nil {
 		fm.lastResult = err
 	} else {

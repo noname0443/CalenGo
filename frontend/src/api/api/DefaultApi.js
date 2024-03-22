@@ -46,13 +46,18 @@ export default class DefaultApi {
 
     /**
      * Your POST endpoint
+     * @param {String} credentials username:password
      * @param {Object} opts Optional parameters
      * @param {module:model/Note} [note] 
      * @param {module:api/DefaultApi~deleteApiV1NoteCallback} callback The callback function, accepting three arguments: error, data, response
      */
-    deleteApiV1Note(opts, callback) {
+    deleteApiV1Note(credentials, opts, callback) {
       opts = opts || {};
       let postBody = opts['note'];
+      // verify the required parameter 'credentials' is set
+      if (credentials === undefined || credentials === null) {
+        throw new Error("Missing the required parameter 'credentials' when calling deleteApiV1Note");
+      }
 
       let pathParams = {
       };
@@ -84,13 +89,18 @@ export default class DefaultApi {
 
     /**
      * Your POST endpoint
+     * @param {String} credentials username:password
      * @param {Object} opts Optional parameters
      * @param {module:model/User} [user] 
      * @param {module:api/DefaultApi~deleteApiV1UserCallback} callback The callback function, accepting three arguments: error, data, response
      */
-    deleteApiV1User(opts, callback) {
+    deleteApiV1User(credentials, opts, callback) {
       opts = opts || {};
       let postBody = opts['user'];
+      // verify the required parameter 'credentials' is set
+      if (credentials === undefined || credentials === null) {
+        throw new Error("Missing the required parameter 'credentials' when calling deleteApiV1User");
+      }
 
       let pathParams = {
       };
@@ -123,14 +133,19 @@ export default class DefaultApi {
     /**
      * Your GET endpoint
      * @param {String} note 
+     * @param {String} credentials username:password
      * @param {module:api/DefaultApi~getApiV1NoteCallback} callback The callback function, accepting three arguments: error, data, response
      * data is of type: {@link module:model/Note}
      */
-    getApiV1Note(note, callback) {
+    getApiV1Note(note, credentials, callback) {
       let postBody = null;
       // verify the required parameter 'note' is set
       if (note === undefined || note === null) {
         throw new Error("Missing the required parameter 'note' when calling getApiV1Note");
+      }
+      // verify the required parameter 'credentials' is set
+      if (credentials === undefined || credentials === null) {
+        throw new Error("Missing the required parameter 'credentials' when calling getApiV1Note");
       }
 
       let pathParams = {
@@ -165,14 +180,19 @@ export default class DefaultApi {
     /**
      * Your GET endpoint
      * @param {String} user 
+     * @param {String} credentials username:password
      * @param {module:api/DefaultApi~getApiV1UserCallback} callback The callback function, accepting three arguments: error, data, response
      * data is of type: {@link module:model/User}
      */
-    getApiV1User(user, callback) {
+    getApiV1User(user, credentials, callback) {
       let postBody = null;
       // verify the required parameter 'user' is set
       if (user === undefined || user === null) {
         throw new Error("Missing the required parameter 'user' when calling getApiV1User");
+      }
+      // verify the required parameter 'credentials' is set
+      if (credentials === undefined || credentials === null) {
+        throw new Error("Missing the required parameter 'credentials' when calling getApiV1User");
       }
 
       let pathParams = {
@@ -206,14 +226,19 @@ export default class DefaultApi {
 
     /**
      * Your GET endpoint
+     * @param {String} credentials username:password
      * @param {Object} opts Optional parameters
      * @param {module:model/ListApiV1NoteRequest} [listApiV1NoteRequest] 
      * @param {module:api/DefaultApi~listApiV1NoteCallback} callback The callback function, accepting three arguments: error, data, response
      * data is of type: {@link Array.<module:model/Note>}
      */
-    listApiV1Note(opts, callback) {
+    listApiV1Note(credentials, opts, callback) {
       opts = opts || {};
       let postBody = opts['listApiV1NoteRequest'];
+      // verify the required parameter 'credentials' is set
+      if (credentials === undefined || credentials === null) {
+        throw new Error("Missing the required parameter 'credentials' when calling listApiV1Note");
+      }
 
       let pathParams = {
       };
@@ -229,7 +254,7 @@ export default class DefaultApi {
       let accepts = ['application/json'];
       let returnType = [Note];
       return this.apiClient.callApi(
-        '/api/v1/note', 'PATCH',
+        '/api/v1/note', 'GET',
         pathParams, queryParams, headerParams, formParams, postBody,
         authNames, contentTypes, accepts, returnType, null, callback
       );
@@ -245,13 +270,18 @@ export default class DefaultApi {
 
     /**
      * Your POST endpoint
+     * @param {String} credentials username:password
      * @param {Object} opts Optional parameters
      * @param {module:model/Note} [note] 
      * @param {module:api/DefaultApi~postApiV1NoteCallback} callback The callback function, accepting three arguments: error, data, response
      */
-    postApiV1Note(opts, callback) {
+    postApiV1Note(credentials, opts, callback) {
       opts = opts || {};
       let postBody = opts['note'];
+      // verify the required parameter 'credentials' is set
+      if (credentials === undefined || credentials === null) {
+        throw new Error("Missing the required parameter 'credentials' when calling postApiV1Note");
+      }
 
       let pathParams = {
       };
@@ -321,13 +351,18 @@ export default class DefaultApi {
 
     /**
      * Your POST endpoint
+     * @param {String} credentials username:password
      * @param {Object} opts Optional parameters
      * @param {module:model/Note} [note] 
      * @param {module:api/DefaultApi~putApiV1NoteCallback} callback The callback function, accepting three arguments: error, data, response
      */
-    putApiV1Note(opts, callback) {
+    putApiV1Note(credentials, opts, callback) {
       opts = opts || {};
       let postBody = opts['note'];
+      // verify the required parameter 'credentials' is set
+      if (credentials === undefined || credentials === null) {
+        throw new Error("Missing the required parameter 'credentials' when calling putApiV1Note");
+      }
 
       let pathParams = {
       };
@@ -359,13 +394,18 @@ export default class DefaultApi {
 
     /**
      * Your POST endpoint
+     * @param {String} credentials username:password
      * @param {Object} opts Optional parameters
      * @param {module:model/User} [user] 
      * @param {module:api/DefaultApi~putApiV1UserCallback} callback The callback function, accepting three arguments: error, data, response
      */
-    putApiV1User(opts, callback) {
+    putApiV1User(credentials, opts, callback) {
       opts = opts || {};
       let postBody = opts['user'];
+      // verify the required parameter 'credentials' is set
+      if (credentials === undefined || credentials === null) {
+        throw new Error("Missing the required parameter 'credentials' when calling putApiV1User");
+      }
 
       let pathParams = {
       };

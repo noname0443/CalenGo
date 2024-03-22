@@ -17,6 +17,7 @@ func (l logWriterType) Write(p []byte) (n int, err error) {
 
 func TestFeatures(t *testing.T) {
 	logrus.SetOutput(logWriterType{t: t})
+	logrus.SetLevel(logrus.DebugLevel)
 	fm, err := NewFeatureManager()
 	if err != nil {
 		logrus.Fatal(err)
@@ -49,6 +50,7 @@ func InitializeScenario(fm *FeatureManager, sc *godog.ScenarioContext) {
 		return ctx, nil
 	})
 	sc.Step(`^I start the server on "([^"]*)"$`, fm.StepStartServerOn)
+	sc.Step(`^I set credentials "([^"]*)"$`, fm.StepSetCredentials)
 	sc.Step(`^The server is working$`, fm.StepIsWorkingOn)
 
 	sc.Step(`^I GET note /api/v1/note/([^"]*)$`, fm.StepGetNote)

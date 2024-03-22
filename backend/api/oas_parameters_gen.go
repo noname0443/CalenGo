@@ -15,9 +15,123 @@ import (
 	"github.com/ogen-go/ogen/validate"
 )
 
+// DeleteAPIV1NoteParams is parameters of delete-api-v1-note operation.
+type DeleteAPIV1NoteParams struct {
+	// Username:password.
+	Credentials string
+}
+
+func unpackDeleteAPIV1NoteParams(packed middleware.Parameters) (params DeleteAPIV1NoteParams) {
+	{
+		key := middleware.ParameterKey{
+			Name: "credentials",
+			In:   "cookie",
+		}
+		params.Credentials = packed[key].(string)
+	}
+	return params
+}
+
+func decodeDeleteAPIV1NoteParams(args [0]string, argsEscaped bool, r *http.Request) (params DeleteAPIV1NoteParams, _ error) {
+	c := uri.NewCookieDecoder(r)
+	// Decode cookie: credentials.
+	if err := func() error {
+		cfg := uri.CookieParameterDecodingConfig{
+			Name:    "credentials",
+			Explode: true,
+		}
+		if err := c.HasParam(cfg); err == nil {
+			if err := c.DecodeParam(cfg, func(d uri.Decoder) error {
+				val, err := d.DecodeValue()
+				if err != nil {
+					return err
+				}
+
+				c, err := conv.ToString(val)
+				if err != nil {
+					return err
+				}
+
+				params.Credentials = c
+				return nil
+			}); err != nil {
+				return err
+			}
+		} else {
+			return validate.ErrFieldRequired
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "credentials",
+			In:   "cookie",
+			Err:  err,
+		}
+	}
+	return params, nil
+}
+
+// DeleteAPIV1UserParams is parameters of delete-api-v1-user operation.
+type DeleteAPIV1UserParams struct {
+	// Username:password.
+	Credentials string
+}
+
+func unpackDeleteAPIV1UserParams(packed middleware.Parameters) (params DeleteAPIV1UserParams) {
+	{
+		key := middleware.ParameterKey{
+			Name: "credentials",
+			In:   "cookie",
+		}
+		params.Credentials = packed[key].(string)
+	}
+	return params
+}
+
+func decodeDeleteAPIV1UserParams(args [0]string, argsEscaped bool, r *http.Request) (params DeleteAPIV1UserParams, _ error) {
+	c := uri.NewCookieDecoder(r)
+	// Decode cookie: credentials.
+	if err := func() error {
+		cfg := uri.CookieParameterDecodingConfig{
+			Name:    "credentials",
+			Explode: true,
+		}
+		if err := c.HasParam(cfg); err == nil {
+			if err := c.DecodeParam(cfg, func(d uri.Decoder) error {
+				val, err := d.DecodeValue()
+				if err != nil {
+					return err
+				}
+
+				c, err := conv.ToString(val)
+				if err != nil {
+					return err
+				}
+
+				params.Credentials = c
+				return nil
+			}); err != nil {
+				return err
+			}
+		} else {
+			return validate.ErrFieldRequired
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "credentials",
+			In:   "cookie",
+			Err:  err,
+		}
+	}
+	return params, nil
+}
+
 // GetAPIV1NoteParams is parameters of get-api-v1-note operation.
 type GetAPIV1NoteParams struct {
 	Note string
+	// Username:password.
+	Credentials string
 }
 
 func unpackGetAPIV1NoteParams(packed middleware.Parameters) (params GetAPIV1NoteParams) {
@@ -28,10 +142,18 @@ func unpackGetAPIV1NoteParams(packed middleware.Parameters) (params GetAPIV1Note
 		}
 		params.Note = packed[key].(string)
 	}
+	{
+		key := middleware.ParameterKey{
+			Name: "credentials",
+			In:   "cookie",
+		}
+		params.Credentials = packed[key].(string)
+	}
 	return params
 }
 
 func decodeGetAPIV1NoteParams(args [1]string, argsEscaped bool, r *http.Request) (params GetAPIV1NoteParams, _ error) {
+	c := uri.NewCookieDecoder(r)
 	// Decode path: note.
 	if err := func() error {
 		param := args[0]
@@ -77,12 +199,48 @@ func decodeGetAPIV1NoteParams(args [1]string, argsEscaped bool, r *http.Request)
 			Err:  err,
 		}
 	}
+	// Decode cookie: credentials.
+	if err := func() error {
+		cfg := uri.CookieParameterDecodingConfig{
+			Name:    "credentials",
+			Explode: true,
+		}
+		if err := c.HasParam(cfg); err == nil {
+			if err := c.DecodeParam(cfg, func(d uri.Decoder) error {
+				val, err := d.DecodeValue()
+				if err != nil {
+					return err
+				}
+
+				c, err := conv.ToString(val)
+				if err != nil {
+					return err
+				}
+
+				params.Credentials = c
+				return nil
+			}); err != nil {
+				return err
+			}
+		} else {
+			return validate.ErrFieldRequired
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "credentials",
+			In:   "cookie",
+			Err:  err,
+		}
+	}
 	return params, nil
 }
 
 // GetAPIV1UserParams is parameters of get-api-v1-user operation.
 type GetAPIV1UserParams struct {
 	User string
+	// Username:password.
+	Credentials string
 }
 
 func unpackGetAPIV1UserParams(packed middleware.Parameters) (params GetAPIV1UserParams) {
@@ -93,10 +251,18 @@ func unpackGetAPIV1UserParams(packed middleware.Parameters) (params GetAPIV1User
 		}
 		params.User = packed[key].(string)
 	}
+	{
+		key := middleware.ParameterKey{
+			Name: "credentials",
+			In:   "cookie",
+		}
+		params.Credentials = packed[key].(string)
+	}
 	return params
 }
 
 func decodeGetAPIV1UserParams(args [1]string, argsEscaped bool, r *http.Request) (params GetAPIV1UserParams, _ error) {
+	c := uri.NewCookieDecoder(r)
 	// Decode path: user.
 	if err := func() error {
 		param := args[0]
@@ -139,6 +305,264 @@ func decodeGetAPIV1UserParams(args [1]string, argsEscaped bool, r *http.Request)
 		return params, &ogenerrors.DecodeParamError{
 			Name: "user",
 			In:   "path",
+			Err:  err,
+		}
+	}
+	// Decode cookie: credentials.
+	if err := func() error {
+		cfg := uri.CookieParameterDecodingConfig{
+			Name:    "credentials",
+			Explode: true,
+		}
+		if err := c.HasParam(cfg); err == nil {
+			if err := c.DecodeParam(cfg, func(d uri.Decoder) error {
+				val, err := d.DecodeValue()
+				if err != nil {
+					return err
+				}
+
+				c, err := conv.ToString(val)
+				if err != nil {
+					return err
+				}
+
+				params.Credentials = c
+				return nil
+			}); err != nil {
+				return err
+			}
+		} else {
+			return validate.ErrFieldRequired
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "credentials",
+			In:   "cookie",
+			Err:  err,
+		}
+	}
+	return params, nil
+}
+
+// ListAPIV1NoteParams is parameters of list-api-v1-note operation.
+type ListAPIV1NoteParams struct {
+	// Username:password.
+	Credentials string
+}
+
+func unpackListAPIV1NoteParams(packed middleware.Parameters) (params ListAPIV1NoteParams) {
+	{
+		key := middleware.ParameterKey{
+			Name: "credentials",
+			In:   "cookie",
+		}
+		params.Credentials = packed[key].(string)
+	}
+	return params
+}
+
+func decodeListAPIV1NoteParams(args [0]string, argsEscaped bool, r *http.Request) (params ListAPIV1NoteParams, _ error) {
+	c := uri.NewCookieDecoder(r)
+	// Decode cookie: credentials.
+	if err := func() error {
+		cfg := uri.CookieParameterDecodingConfig{
+			Name:    "credentials",
+			Explode: true,
+		}
+		if err := c.HasParam(cfg); err == nil {
+			if err := c.DecodeParam(cfg, func(d uri.Decoder) error {
+				val, err := d.DecodeValue()
+				if err != nil {
+					return err
+				}
+
+				c, err := conv.ToString(val)
+				if err != nil {
+					return err
+				}
+
+				params.Credentials = c
+				return nil
+			}); err != nil {
+				return err
+			}
+		} else {
+			return validate.ErrFieldRequired
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "credentials",
+			In:   "cookie",
+			Err:  err,
+		}
+	}
+	return params, nil
+}
+
+// PostAPIV1NoteParams is parameters of post-api-v1-note operation.
+type PostAPIV1NoteParams struct {
+	// Username:password.
+	Credentials string
+}
+
+func unpackPostAPIV1NoteParams(packed middleware.Parameters) (params PostAPIV1NoteParams) {
+	{
+		key := middleware.ParameterKey{
+			Name: "credentials",
+			In:   "cookie",
+		}
+		params.Credentials = packed[key].(string)
+	}
+	return params
+}
+
+func decodePostAPIV1NoteParams(args [0]string, argsEscaped bool, r *http.Request) (params PostAPIV1NoteParams, _ error) {
+	c := uri.NewCookieDecoder(r)
+	// Decode cookie: credentials.
+	if err := func() error {
+		cfg := uri.CookieParameterDecodingConfig{
+			Name:    "credentials",
+			Explode: true,
+		}
+		if err := c.HasParam(cfg); err == nil {
+			if err := c.DecodeParam(cfg, func(d uri.Decoder) error {
+				val, err := d.DecodeValue()
+				if err != nil {
+					return err
+				}
+
+				c, err := conv.ToString(val)
+				if err != nil {
+					return err
+				}
+
+				params.Credentials = c
+				return nil
+			}); err != nil {
+				return err
+			}
+		} else {
+			return validate.ErrFieldRequired
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "credentials",
+			In:   "cookie",
+			Err:  err,
+		}
+	}
+	return params, nil
+}
+
+// PutAPIV1NoteParams is parameters of put-api-v1-note operation.
+type PutAPIV1NoteParams struct {
+	// Username:password.
+	Credentials string
+}
+
+func unpackPutAPIV1NoteParams(packed middleware.Parameters) (params PutAPIV1NoteParams) {
+	{
+		key := middleware.ParameterKey{
+			Name: "credentials",
+			In:   "cookie",
+		}
+		params.Credentials = packed[key].(string)
+	}
+	return params
+}
+
+func decodePutAPIV1NoteParams(args [0]string, argsEscaped bool, r *http.Request) (params PutAPIV1NoteParams, _ error) {
+	c := uri.NewCookieDecoder(r)
+	// Decode cookie: credentials.
+	if err := func() error {
+		cfg := uri.CookieParameterDecodingConfig{
+			Name:    "credentials",
+			Explode: true,
+		}
+		if err := c.HasParam(cfg); err == nil {
+			if err := c.DecodeParam(cfg, func(d uri.Decoder) error {
+				val, err := d.DecodeValue()
+				if err != nil {
+					return err
+				}
+
+				c, err := conv.ToString(val)
+				if err != nil {
+					return err
+				}
+
+				params.Credentials = c
+				return nil
+			}); err != nil {
+				return err
+			}
+		} else {
+			return validate.ErrFieldRequired
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "credentials",
+			In:   "cookie",
+			Err:  err,
+		}
+	}
+	return params, nil
+}
+
+// PutAPIV1UserParams is parameters of put-api-v1-user operation.
+type PutAPIV1UserParams struct {
+	// Username:password.
+	Credentials string
+}
+
+func unpackPutAPIV1UserParams(packed middleware.Parameters) (params PutAPIV1UserParams) {
+	{
+		key := middleware.ParameterKey{
+			Name: "credentials",
+			In:   "cookie",
+		}
+		params.Credentials = packed[key].(string)
+	}
+	return params
+}
+
+func decodePutAPIV1UserParams(args [0]string, argsEscaped bool, r *http.Request) (params PutAPIV1UserParams, _ error) {
+	c := uri.NewCookieDecoder(r)
+	// Decode cookie: credentials.
+	if err := func() error {
+		cfg := uri.CookieParameterDecodingConfig{
+			Name:    "credentials",
+			Explode: true,
+		}
+		if err := c.HasParam(cfg); err == nil {
+			if err := c.DecodeParam(cfg, func(d uri.Decoder) error {
+				val, err := d.DecodeValue()
+				if err != nil {
+					return err
+				}
+
+				c, err := conv.ToString(val)
+				if err != nil {
+					return err
+				}
+
+				params.Credentials = c
+				return nil
+			}); err != nil {
+				return err
+			}
+		} else {
+			return validate.ErrFieldRequired
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "credentials",
+			In:   "cookie",
 			Err:  err,
 		}
 	}

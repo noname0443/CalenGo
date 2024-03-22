@@ -3,7 +3,30 @@ Feature: Start Server
         When I start the server on "0.0.0.0:3000"
         And The server is working
     
-    Scenario: Note handler tests
+    Scenario: Create test user
+        When I POST user /api/v1/user
+        """
+        {
+            "name": "test_user",
+            "password": "test_password"
+        }
+        """
+        Then I got no error
+
+        When I GET user /api/v1/user/test_user
+        Then I got line "decode response: unexpected status code: 500"
+
+        When I set credentials "test_user:test_password"
+        And I GET user /api/v1/user/test_user
+        Then I got data
+        """
+        {
+            "name": "test_user",
+            "password": "test_password"
+        }
+        """
+
+    Scenario: Create test notes
         When I POST note /api/v1/note
         """
         {
@@ -74,18 +97,6 @@ Feature: Start Server
         Then I got line "decode response: unexpected status code: 501"
 
     Scenario: User handler tests
-        When I POST user /api/v1/user
-        """
-        {
-            "name": "user",
-            "password": "user"
-        }
-        """
-        Then I got line "decode response: unexpected status code: 501"
-
-        When I GET user /api/v1/user/user1
-        Then I got line "decode response: unexpected status code: 501"
-
         When I PUT user /api/v1/user
         """
         {

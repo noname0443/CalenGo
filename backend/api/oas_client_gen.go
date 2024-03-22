@@ -28,13 +28,13 @@ type Invoker interface {
 	// Your POST endpoint.
 	//
 	// DELETE /api/v1/note
-	DeleteAPIV1Note(ctx context.Context, request OptNote) (DeleteAPIV1NoteRes, error)
+	DeleteAPIV1Note(ctx context.Context, request OptNote, params DeleteAPIV1NoteParams) (DeleteAPIV1NoteRes, error)
 	// DeleteAPIV1User invokes delete-api-v1-user operation.
 	//
 	// Your POST endpoint.
 	//
 	// DELETE /api/v1/user
-	DeleteAPIV1User(ctx context.Context, request OptUser) (DeleteAPIV1UserRes, error)
+	DeleteAPIV1User(ctx context.Context, request OptUser, params DeleteAPIV1UserParams) (DeleteAPIV1UserRes, error)
 	// GetAPIV1Note invokes get-api-v1-note operation.
 	//
 	// Your GET endpoint.
@@ -51,14 +51,14 @@ type Invoker interface {
 	//
 	// Your GET endpoint.
 	//
-	// PATCH /api/v1/note
-	ListAPIV1Note(ctx context.Context, request OptListAPIV1NoteReq) (ListAPIV1NoteRes, error)
+	// GET /api/v1/note
+	ListAPIV1Note(ctx context.Context, request OptListAPIV1NoteReq, params ListAPIV1NoteParams) (ListAPIV1NoteRes, error)
 	// PostAPIV1Note invokes post-api-v1-note operation.
 	//
 	// Your POST endpoint.
 	//
 	// POST /api/v1/note
-	PostAPIV1Note(ctx context.Context, request OptNote) (PostAPIV1NoteRes, error)
+	PostAPIV1Note(ctx context.Context, request OptNote, params PostAPIV1NoteParams) (PostAPIV1NoteRes, error)
 	// PostAPIV1User invokes post-api-v1-user operation.
 	//
 	// Your POST endpoint.
@@ -70,13 +70,13 @@ type Invoker interface {
 	// Your POST endpoint.
 	//
 	// PUT /api/v1/note
-	PutAPIV1Note(ctx context.Context, request OptNote) (PutAPIV1NoteRes, error)
+	PutAPIV1Note(ctx context.Context, request OptNote, params PutAPIV1NoteParams) (PutAPIV1NoteRes, error)
 	// PutAPIV1User invokes put-api-v1-user operation.
 	//
 	// Your POST endpoint.
 	//
 	// PUT /api/v1/user
-	PutAPIV1User(ctx context.Context, request OptUser) (PutAPIV1UserRes, error)
+	PutAPIV1User(ctx context.Context, request OptUser, params PutAPIV1UserParams) (PutAPIV1UserRes, error)
 }
 
 // Client implements OAS client.
@@ -132,12 +132,12 @@ func (c *Client) requestURL(ctx context.Context) *url.URL {
 // Your POST endpoint.
 //
 // DELETE /api/v1/note
-func (c *Client) DeleteAPIV1Note(ctx context.Context, request OptNote) (DeleteAPIV1NoteRes, error) {
-	res, err := c.sendDeleteAPIV1Note(ctx, request)
+func (c *Client) DeleteAPIV1Note(ctx context.Context, request OptNote, params DeleteAPIV1NoteParams) (DeleteAPIV1NoteRes, error) {
+	res, err := c.sendDeleteAPIV1Note(ctx, request, params)
 	return res, err
 }
 
-func (c *Client) sendDeleteAPIV1Note(ctx context.Context, request OptNote) (res DeleteAPIV1NoteRes, err error) {
+func (c *Client) sendDeleteAPIV1Note(ctx context.Context, request OptNote, params DeleteAPIV1NoteParams) (res DeleteAPIV1NoteRes, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("delete-api-v1-note"),
 		semconv.HTTPMethodKey.String("DELETE"),
@@ -186,6 +186,22 @@ func (c *Client) sendDeleteAPIV1Note(ctx context.Context, request OptNote) (res 
 		return res, errors.Wrap(err, "encode request")
 	}
 
+	stage = "EncodeCookieParams"
+	cookie := uri.NewCookieEncoder(r)
+	{
+		// Encode "credentials" parameter.
+		cfg := uri.CookieParameterEncodingConfig{
+			Name:    "credentials",
+			Explode: true,
+		}
+
+		if err := cookie.EncodeParam(cfg, func(e uri.Encoder) error {
+			return e.EncodeValue(conv.StringToString(params.Credentials))
+		}); err != nil {
+			return res, errors.Wrap(err, "encode cookie")
+		}
+	}
+
 	stage = "SendRequest"
 	resp, err := c.cfg.Client.Do(r)
 	if err != nil {
@@ -207,12 +223,12 @@ func (c *Client) sendDeleteAPIV1Note(ctx context.Context, request OptNote) (res 
 // Your POST endpoint.
 //
 // DELETE /api/v1/user
-func (c *Client) DeleteAPIV1User(ctx context.Context, request OptUser) (DeleteAPIV1UserRes, error) {
-	res, err := c.sendDeleteAPIV1User(ctx, request)
+func (c *Client) DeleteAPIV1User(ctx context.Context, request OptUser, params DeleteAPIV1UserParams) (DeleteAPIV1UserRes, error) {
+	res, err := c.sendDeleteAPIV1User(ctx, request, params)
 	return res, err
 }
 
-func (c *Client) sendDeleteAPIV1User(ctx context.Context, request OptUser) (res DeleteAPIV1UserRes, err error) {
+func (c *Client) sendDeleteAPIV1User(ctx context.Context, request OptUser, params DeleteAPIV1UserParams) (res DeleteAPIV1UserRes, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("delete-api-v1-user"),
 		semconv.HTTPMethodKey.String("DELETE"),
@@ -259,6 +275,22 @@ func (c *Client) sendDeleteAPIV1User(ctx context.Context, request OptUser) (res 
 	}
 	if err := encodeDeleteAPIV1UserRequest(request, r); err != nil {
 		return res, errors.Wrap(err, "encode request")
+	}
+
+	stage = "EncodeCookieParams"
+	cookie := uri.NewCookieEncoder(r)
+	{
+		// Encode "credentials" parameter.
+		cfg := uri.CookieParameterEncodingConfig{
+			Name:    "credentials",
+			Explode: true,
+		}
+
+		if err := cookie.EncodeParam(cfg, func(e uri.Encoder) error {
+			return e.EncodeValue(conv.StringToString(params.Credentials))
+		}); err != nil {
+			return res, errors.Wrap(err, "encode cookie")
+		}
 	}
 
 	stage = "SendRequest"
@@ -351,6 +383,22 @@ func (c *Client) sendGetAPIV1Note(ctx context.Context, params GetAPIV1NoteParams
 		return res, errors.Wrap(err, "create request")
 	}
 
+	stage = "EncodeCookieParams"
+	cookie := uri.NewCookieEncoder(r)
+	{
+		// Encode "credentials" parameter.
+		cfg := uri.CookieParameterEncodingConfig{
+			Name:    "credentials",
+			Explode: true,
+		}
+
+		if err := cookie.EncodeParam(cfg, func(e uri.Encoder) error {
+			return e.EncodeValue(conv.StringToString(params.Credentials))
+		}); err != nil {
+			return res, errors.Wrap(err, "encode cookie")
+		}
+	}
+
 	stage = "SendRequest"
 	resp, err := c.cfg.Client.Do(r)
 	if err != nil {
@@ -441,6 +489,22 @@ func (c *Client) sendGetAPIV1User(ctx context.Context, params GetAPIV1UserParams
 		return res, errors.Wrap(err, "create request")
 	}
 
+	stage = "EncodeCookieParams"
+	cookie := uri.NewCookieEncoder(r)
+	{
+		// Encode "credentials" parameter.
+		cfg := uri.CookieParameterEncodingConfig{
+			Name:    "credentials",
+			Explode: true,
+		}
+
+		if err := cookie.EncodeParam(cfg, func(e uri.Encoder) error {
+			return e.EncodeValue(conv.StringToString(params.Credentials))
+		}); err != nil {
+			return res, errors.Wrap(err, "encode cookie")
+		}
+	}
+
 	stage = "SendRequest"
 	resp, err := c.cfg.Client.Do(r)
 	if err != nil {
@@ -461,16 +525,16 @@ func (c *Client) sendGetAPIV1User(ctx context.Context, params GetAPIV1UserParams
 //
 // Your GET endpoint.
 //
-// PATCH /api/v1/note
-func (c *Client) ListAPIV1Note(ctx context.Context, request OptListAPIV1NoteReq) (ListAPIV1NoteRes, error) {
-	res, err := c.sendListAPIV1Note(ctx, request)
+// GET /api/v1/note
+func (c *Client) ListAPIV1Note(ctx context.Context, request OptListAPIV1NoteReq, params ListAPIV1NoteParams) (ListAPIV1NoteRes, error) {
+	res, err := c.sendListAPIV1Note(ctx, request, params)
 	return res, err
 }
 
-func (c *Client) sendListAPIV1Note(ctx context.Context, request OptListAPIV1NoteReq) (res ListAPIV1NoteRes, err error) {
+func (c *Client) sendListAPIV1Note(ctx context.Context, request OptListAPIV1NoteReq, params ListAPIV1NoteParams) (res ListAPIV1NoteRes, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("list-api-v1-note"),
-		semconv.HTTPMethodKey.String("PATCH"),
+		semconv.HTTPMethodKey.String("GET"),
 		semconv.HTTPRouteKey.String("/api/v1/note"),
 	}
 
@@ -508,12 +572,28 @@ func (c *Client) sendListAPIV1Note(ctx context.Context, request OptListAPIV1Note
 	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "PATCH", u)
+	r, err := ht.NewRequest(ctx, "GET", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
 	if err := encodeListAPIV1NoteRequest(request, r); err != nil {
 		return res, errors.Wrap(err, "encode request")
+	}
+
+	stage = "EncodeCookieParams"
+	cookie := uri.NewCookieEncoder(r)
+	{
+		// Encode "credentials" parameter.
+		cfg := uri.CookieParameterEncodingConfig{
+			Name:    "credentials",
+			Explode: true,
+		}
+
+		if err := cookie.EncodeParam(cfg, func(e uri.Encoder) error {
+			return e.EncodeValue(conv.StringToString(params.Credentials))
+		}); err != nil {
+			return res, errors.Wrap(err, "encode cookie")
+		}
 	}
 
 	stage = "SendRequest"
@@ -537,12 +617,12 @@ func (c *Client) sendListAPIV1Note(ctx context.Context, request OptListAPIV1Note
 // Your POST endpoint.
 //
 // POST /api/v1/note
-func (c *Client) PostAPIV1Note(ctx context.Context, request OptNote) (PostAPIV1NoteRes, error) {
-	res, err := c.sendPostAPIV1Note(ctx, request)
+func (c *Client) PostAPIV1Note(ctx context.Context, request OptNote, params PostAPIV1NoteParams) (PostAPIV1NoteRes, error) {
+	res, err := c.sendPostAPIV1Note(ctx, request, params)
 	return res, err
 }
 
-func (c *Client) sendPostAPIV1Note(ctx context.Context, request OptNote) (res PostAPIV1NoteRes, err error) {
+func (c *Client) sendPostAPIV1Note(ctx context.Context, request OptNote, params PostAPIV1NoteParams) (res PostAPIV1NoteRes, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("post-api-v1-note"),
 		semconv.HTTPMethodKey.String("POST"),
@@ -589,6 +669,22 @@ func (c *Client) sendPostAPIV1Note(ctx context.Context, request OptNote) (res Po
 	}
 	if err := encodePostAPIV1NoteRequest(request, r); err != nil {
 		return res, errors.Wrap(err, "encode request")
+	}
+
+	stage = "EncodeCookieParams"
+	cookie := uri.NewCookieEncoder(r)
+	{
+		// Encode "credentials" parameter.
+		cfg := uri.CookieParameterEncodingConfig{
+			Name:    "credentials",
+			Explode: true,
+		}
+
+		if err := cookie.EncodeParam(cfg, func(e uri.Encoder) error {
+			return e.EncodeValue(conv.StringToString(params.Credentials))
+		}); err != nil {
+			return res, errors.Wrap(err, "encode cookie")
+		}
 	}
 
 	stage = "SendRequest"
@@ -687,12 +783,12 @@ func (c *Client) sendPostAPIV1User(ctx context.Context, request OptUser) (res Po
 // Your POST endpoint.
 //
 // PUT /api/v1/note
-func (c *Client) PutAPIV1Note(ctx context.Context, request OptNote) (PutAPIV1NoteRes, error) {
-	res, err := c.sendPutAPIV1Note(ctx, request)
+func (c *Client) PutAPIV1Note(ctx context.Context, request OptNote, params PutAPIV1NoteParams) (PutAPIV1NoteRes, error) {
+	res, err := c.sendPutAPIV1Note(ctx, request, params)
 	return res, err
 }
 
-func (c *Client) sendPutAPIV1Note(ctx context.Context, request OptNote) (res PutAPIV1NoteRes, err error) {
+func (c *Client) sendPutAPIV1Note(ctx context.Context, request OptNote, params PutAPIV1NoteParams) (res PutAPIV1NoteRes, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("put-api-v1-note"),
 		semconv.HTTPMethodKey.String("PUT"),
@@ -741,6 +837,22 @@ func (c *Client) sendPutAPIV1Note(ctx context.Context, request OptNote) (res Put
 		return res, errors.Wrap(err, "encode request")
 	}
 
+	stage = "EncodeCookieParams"
+	cookie := uri.NewCookieEncoder(r)
+	{
+		// Encode "credentials" parameter.
+		cfg := uri.CookieParameterEncodingConfig{
+			Name:    "credentials",
+			Explode: true,
+		}
+
+		if err := cookie.EncodeParam(cfg, func(e uri.Encoder) error {
+			return e.EncodeValue(conv.StringToString(params.Credentials))
+		}); err != nil {
+			return res, errors.Wrap(err, "encode cookie")
+		}
+	}
+
 	stage = "SendRequest"
 	resp, err := c.cfg.Client.Do(r)
 	if err != nil {
@@ -762,12 +874,12 @@ func (c *Client) sendPutAPIV1Note(ctx context.Context, request OptNote) (res Put
 // Your POST endpoint.
 //
 // PUT /api/v1/user
-func (c *Client) PutAPIV1User(ctx context.Context, request OptUser) (PutAPIV1UserRes, error) {
-	res, err := c.sendPutAPIV1User(ctx, request)
+func (c *Client) PutAPIV1User(ctx context.Context, request OptUser, params PutAPIV1UserParams) (PutAPIV1UserRes, error) {
+	res, err := c.sendPutAPIV1User(ctx, request, params)
 	return res, err
 }
 
-func (c *Client) sendPutAPIV1User(ctx context.Context, request OptUser) (res PutAPIV1UserRes, err error) {
+func (c *Client) sendPutAPIV1User(ctx context.Context, request OptUser, params PutAPIV1UserParams) (res PutAPIV1UserRes, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("put-api-v1-user"),
 		semconv.HTTPMethodKey.String("PUT"),
@@ -814,6 +926,22 @@ func (c *Client) sendPutAPIV1User(ctx context.Context, request OptUser) (res Put
 	}
 	if err := encodePutAPIV1UserRequest(request, r); err != nil {
 		return res, errors.Wrap(err, "encode request")
+	}
+
+	stage = "EncodeCookieParams"
+	cookie := uri.NewCookieEncoder(r)
+	{
+		// Encode "credentials" parameter.
+		cfg := uri.CookieParameterEncodingConfig{
+			Name:    "credentials",
+			Explode: true,
+		}
+
+		if err := cookie.EncodeParam(cfg, func(e uri.Encoder) error {
+			return e.EncodeValue(conv.StringToString(params.Credentials))
+		}); err != nil {
+			return res, errors.Wrap(err, "encode cookie")
+		}
 	}
 
 	stage = "SendRequest"

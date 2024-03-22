@@ -17,14 +17,18 @@ func main() {
 	var db *sqlx.DB
 	var err error
 
+	logrus.Info("Trying to connect to MySQL")
 	err = utility.DoRetry(func() error {
 		db, err = sqlx.Connect("mysql", "root:root@(mysql:3306)/sys")
+		if err != nil {
+			logrus.Error("Failed to connect to MySQL", err.Error())
+		}
 		return err
 	})
 	if err != nil {
 		logrus.Fatal(err)
 	}
-	
+
 	err = utility.InitSQL(db)
 	if err != nil {
 		logrus.Fatal(err)

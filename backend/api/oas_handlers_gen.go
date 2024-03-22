@@ -62,6 +62,16 @@ func (s *Server) handleDeleteAPIV1NoteRequest(args [0]string, argsEscaped bool, 
 			ID:   "delete-api-v1-note",
 		}
 	)
+	params, err := decodeDeleteAPIV1NoteParams(args, argsEscaped, r)
+	if err != nil {
+		err = &ogenerrors.DecodeParamsError{
+			OperationContext: opErrContext,
+			Err:              err,
+		}
+		recordError("DecodeParams", err)
+		s.cfg.ErrorHandler(ctx, w, r, err)
+		return
+	}
 	request, close, err := s.decodeDeleteAPIV1NoteRequest(r)
 	if err != nil {
 		err = &ogenerrors.DecodeRequestError{
@@ -86,13 +96,18 @@ func (s *Server) handleDeleteAPIV1NoteRequest(args [0]string, argsEscaped bool, 
 			OperationSummary: "Your POST endpoint",
 			OperationID:      "delete-api-v1-note",
 			Body:             request,
-			Params:           middleware.Parameters{},
-			Raw:              r,
+			Params: middleware.Parameters{
+				{
+					Name: "credentials",
+					In:   "cookie",
+				}: params.Credentials,
+			},
+			Raw: r,
 		}
 
 		type (
 			Request  = OptNote
-			Params   = struct{}
+			Params   = DeleteAPIV1NoteParams
 			Response = DeleteAPIV1NoteRes
 		)
 		response, err = middleware.HookMiddleware[
@@ -102,14 +117,14 @@ func (s *Server) handleDeleteAPIV1NoteRequest(args [0]string, argsEscaped bool, 
 		](
 			m,
 			mreq,
-			nil,
+			unpackDeleteAPIV1NoteParams,
 			func(ctx context.Context, request Request, params Params) (response Response, err error) {
-				response, err = s.h.DeleteAPIV1Note(ctx, request)
+				response, err = s.h.DeleteAPIV1Note(ctx, request, params)
 				return response, err
 			},
 		)
 	} else {
-		response, err = s.h.DeleteAPIV1Note(ctx, request)
+		response, err = s.h.DeleteAPIV1Note(ctx, request, params)
 	}
 	if err != nil {
 		recordError("Internal", err)
@@ -168,6 +183,16 @@ func (s *Server) handleDeleteAPIV1UserRequest(args [0]string, argsEscaped bool, 
 			ID:   "delete-api-v1-user",
 		}
 	)
+	params, err := decodeDeleteAPIV1UserParams(args, argsEscaped, r)
+	if err != nil {
+		err = &ogenerrors.DecodeParamsError{
+			OperationContext: opErrContext,
+			Err:              err,
+		}
+		recordError("DecodeParams", err)
+		s.cfg.ErrorHandler(ctx, w, r, err)
+		return
+	}
 	request, close, err := s.decodeDeleteAPIV1UserRequest(r)
 	if err != nil {
 		err = &ogenerrors.DecodeRequestError{
@@ -192,13 +217,18 @@ func (s *Server) handleDeleteAPIV1UserRequest(args [0]string, argsEscaped bool, 
 			OperationSummary: "Your POST endpoint",
 			OperationID:      "delete-api-v1-user",
 			Body:             request,
-			Params:           middleware.Parameters{},
-			Raw:              r,
+			Params: middleware.Parameters{
+				{
+					Name: "credentials",
+					In:   "cookie",
+				}: params.Credentials,
+			},
+			Raw: r,
 		}
 
 		type (
 			Request  = OptUser
-			Params   = struct{}
+			Params   = DeleteAPIV1UserParams
 			Response = DeleteAPIV1UserRes
 		)
 		response, err = middleware.HookMiddleware[
@@ -208,14 +238,14 @@ func (s *Server) handleDeleteAPIV1UserRequest(args [0]string, argsEscaped bool, 
 		](
 			m,
 			mreq,
-			nil,
+			unpackDeleteAPIV1UserParams,
 			func(ctx context.Context, request Request, params Params) (response Response, err error) {
-				response, err = s.h.DeleteAPIV1User(ctx, request)
+				response, err = s.h.DeleteAPIV1User(ctx, request, params)
 				return response, err
 			},
 		)
 	} else {
-		response, err = s.h.DeleteAPIV1User(ctx, request)
+		response, err = s.h.DeleteAPIV1User(ctx, request, params)
 	}
 	if err != nil {
 		recordError("Internal", err)
@@ -298,6 +328,10 @@ func (s *Server) handleGetAPIV1NoteRequest(args [1]string, argsEscaped bool, w h
 					Name: "note",
 					In:   "path",
 				}: params.Note,
+				{
+					Name: "credentials",
+					In:   "cookie",
+				}: params.Credentials,
 			},
 			Raw: r,
 		}
@@ -404,6 +438,10 @@ func (s *Server) handleGetAPIV1UserRequest(args [1]string, argsEscaped bool, w h
 					Name: "user",
 					In:   "path",
 				}: params.User,
+				{
+					Name: "credentials",
+					In:   "cookie",
+				}: params.Credentials,
 			},
 			Raw: r,
 		}
@@ -448,11 +486,11 @@ func (s *Server) handleGetAPIV1UserRequest(args [1]string, argsEscaped bool, w h
 //
 // Your GET endpoint.
 //
-// PATCH /api/v1/note
+// GET /api/v1/note
 func (s *Server) handleListAPIV1NoteRequest(args [0]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("list-api-v1-note"),
-		semconv.HTTPMethodKey.String("PATCH"),
+		semconv.HTTPMethodKey.String("GET"),
 		semconv.HTTPRouteKey.String("/api/v1/note"),
 	}
 
@@ -486,6 +524,16 @@ func (s *Server) handleListAPIV1NoteRequest(args [0]string, argsEscaped bool, w 
 			ID:   "list-api-v1-note",
 		}
 	)
+	params, err := decodeListAPIV1NoteParams(args, argsEscaped, r)
+	if err != nil {
+		err = &ogenerrors.DecodeParamsError{
+			OperationContext: opErrContext,
+			Err:              err,
+		}
+		recordError("DecodeParams", err)
+		s.cfg.ErrorHandler(ctx, w, r, err)
+		return
+	}
 	request, close, err := s.decodeListAPIV1NoteRequest(r)
 	if err != nil {
 		err = &ogenerrors.DecodeRequestError{
@@ -510,13 +558,18 @@ func (s *Server) handleListAPIV1NoteRequest(args [0]string, argsEscaped bool, w 
 			OperationSummary: "Your GET endpoint",
 			OperationID:      "list-api-v1-note",
 			Body:             request,
-			Params:           middleware.Parameters{},
-			Raw:              r,
+			Params: middleware.Parameters{
+				{
+					Name: "credentials",
+					In:   "cookie",
+				}: params.Credentials,
+			},
+			Raw: r,
 		}
 
 		type (
 			Request  = OptListAPIV1NoteReq
-			Params   = struct{}
+			Params   = ListAPIV1NoteParams
 			Response = ListAPIV1NoteRes
 		)
 		response, err = middleware.HookMiddleware[
@@ -526,14 +579,14 @@ func (s *Server) handleListAPIV1NoteRequest(args [0]string, argsEscaped bool, w 
 		](
 			m,
 			mreq,
-			nil,
+			unpackListAPIV1NoteParams,
 			func(ctx context.Context, request Request, params Params) (response Response, err error) {
-				response, err = s.h.ListAPIV1Note(ctx, request)
+				response, err = s.h.ListAPIV1Note(ctx, request, params)
 				return response, err
 			},
 		)
 	} else {
-		response, err = s.h.ListAPIV1Note(ctx, request)
+		response, err = s.h.ListAPIV1Note(ctx, request, params)
 	}
 	if err != nil {
 		recordError("Internal", err)
@@ -592,6 +645,16 @@ func (s *Server) handlePostAPIV1NoteRequest(args [0]string, argsEscaped bool, w 
 			ID:   "post-api-v1-note",
 		}
 	)
+	params, err := decodePostAPIV1NoteParams(args, argsEscaped, r)
+	if err != nil {
+		err = &ogenerrors.DecodeParamsError{
+			OperationContext: opErrContext,
+			Err:              err,
+		}
+		recordError("DecodeParams", err)
+		s.cfg.ErrorHandler(ctx, w, r, err)
+		return
+	}
 	request, close, err := s.decodePostAPIV1NoteRequest(r)
 	if err != nil {
 		err = &ogenerrors.DecodeRequestError{
@@ -616,13 +679,18 @@ func (s *Server) handlePostAPIV1NoteRequest(args [0]string, argsEscaped bool, w 
 			OperationSummary: "Your POST endpoint",
 			OperationID:      "post-api-v1-note",
 			Body:             request,
-			Params:           middleware.Parameters{},
-			Raw:              r,
+			Params: middleware.Parameters{
+				{
+					Name: "credentials",
+					In:   "cookie",
+				}: params.Credentials,
+			},
+			Raw: r,
 		}
 
 		type (
 			Request  = OptNote
-			Params   = struct{}
+			Params   = PostAPIV1NoteParams
 			Response = PostAPIV1NoteRes
 		)
 		response, err = middleware.HookMiddleware[
@@ -632,14 +700,14 @@ func (s *Server) handlePostAPIV1NoteRequest(args [0]string, argsEscaped bool, w 
 		](
 			m,
 			mreq,
-			nil,
+			unpackPostAPIV1NoteParams,
 			func(ctx context.Context, request Request, params Params) (response Response, err error) {
-				response, err = s.h.PostAPIV1Note(ctx, request)
+				response, err = s.h.PostAPIV1Note(ctx, request, params)
 				return response, err
 			},
 		)
 	} else {
-		response, err = s.h.PostAPIV1Note(ctx, request)
+		response, err = s.h.PostAPIV1Note(ctx, request, params)
 	}
 	if err != nil {
 		recordError("Internal", err)
@@ -804,6 +872,16 @@ func (s *Server) handlePutAPIV1NoteRequest(args [0]string, argsEscaped bool, w h
 			ID:   "put-api-v1-note",
 		}
 	)
+	params, err := decodePutAPIV1NoteParams(args, argsEscaped, r)
+	if err != nil {
+		err = &ogenerrors.DecodeParamsError{
+			OperationContext: opErrContext,
+			Err:              err,
+		}
+		recordError("DecodeParams", err)
+		s.cfg.ErrorHandler(ctx, w, r, err)
+		return
+	}
 	request, close, err := s.decodePutAPIV1NoteRequest(r)
 	if err != nil {
 		err = &ogenerrors.DecodeRequestError{
@@ -828,13 +906,18 @@ func (s *Server) handlePutAPIV1NoteRequest(args [0]string, argsEscaped bool, w h
 			OperationSummary: "Your POST endpoint",
 			OperationID:      "put-api-v1-note",
 			Body:             request,
-			Params:           middleware.Parameters{},
-			Raw:              r,
+			Params: middleware.Parameters{
+				{
+					Name: "credentials",
+					In:   "cookie",
+				}: params.Credentials,
+			},
+			Raw: r,
 		}
 
 		type (
 			Request  = OptNote
-			Params   = struct{}
+			Params   = PutAPIV1NoteParams
 			Response = PutAPIV1NoteRes
 		)
 		response, err = middleware.HookMiddleware[
@@ -844,14 +927,14 @@ func (s *Server) handlePutAPIV1NoteRequest(args [0]string, argsEscaped bool, w h
 		](
 			m,
 			mreq,
-			nil,
+			unpackPutAPIV1NoteParams,
 			func(ctx context.Context, request Request, params Params) (response Response, err error) {
-				response, err = s.h.PutAPIV1Note(ctx, request)
+				response, err = s.h.PutAPIV1Note(ctx, request, params)
 				return response, err
 			},
 		)
 	} else {
-		response, err = s.h.PutAPIV1Note(ctx, request)
+		response, err = s.h.PutAPIV1Note(ctx, request, params)
 	}
 	if err != nil {
 		recordError("Internal", err)
@@ -910,6 +993,16 @@ func (s *Server) handlePutAPIV1UserRequest(args [0]string, argsEscaped bool, w h
 			ID:   "put-api-v1-user",
 		}
 	)
+	params, err := decodePutAPIV1UserParams(args, argsEscaped, r)
+	if err != nil {
+		err = &ogenerrors.DecodeParamsError{
+			OperationContext: opErrContext,
+			Err:              err,
+		}
+		recordError("DecodeParams", err)
+		s.cfg.ErrorHandler(ctx, w, r, err)
+		return
+	}
 	request, close, err := s.decodePutAPIV1UserRequest(r)
 	if err != nil {
 		err = &ogenerrors.DecodeRequestError{
@@ -934,13 +1027,18 @@ func (s *Server) handlePutAPIV1UserRequest(args [0]string, argsEscaped bool, w h
 			OperationSummary: "Your POST endpoint",
 			OperationID:      "put-api-v1-user",
 			Body:             request,
-			Params:           middleware.Parameters{},
-			Raw:              r,
+			Params: middleware.Parameters{
+				{
+					Name: "credentials",
+					In:   "cookie",
+				}: params.Credentials,
+			},
+			Raw: r,
 		}
 
 		type (
 			Request  = OptUser
-			Params   = struct{}
+			Params   = PutAPIV1UserParams
 			Response = PutAPIV1UserRes
 		)
 		response, err = middleware.HookMiddleware[
@@ -950,14 +1048,14 @@ func (s *Server) handlePutAPIV1UserRequest(args [0]string, argsEscaped bool, w h
 		](
 			m,
 			mreq,
-			nil,
+			unpackPutAPIV1UserParams,
 			func(ctx context.Context, request Request, params Params) (response Response, err error) {
-				response, err = s.h.PutAPIV1User(ctx, request)
+				response, err = s.h.PutAPIV1User(ctx, request, params)
 				return response, err
 			},
 		)
 	} else {
-		response, err = s.h.PutAPIV1User(ctx, request)
+		response, err = s.h.PutAPIV1User(ctx, request, params)
 	}
 	if err != nil {
 		recordError("Internal", err)

@@ -18,7 +18,7 @@ var _ Handler = UnimplementedHandler{}
 // Your POST endpoint.
 //
 // DELETE /api/v1/note
-func (UnimplementedHandler) DeleteAPIV1Note(ctx context.Context, req OptNote) (r DeleteAPIV1NoteRes, _ error) {
+func (UnimplementedHandler) DeleteAPIV1Note(ctx context.Context, req OptNote, params DeleteAPIV1NoteParams) (r DeleteAPIV1NoteRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -27,7 +27,7 @@ func (UnimplementedHandler) DeleteAPIV1Note(ctx context.Context, req OptNote) (r
 // Your POST endpoint.
 //
 // DELETE /api/v1/user
-func (UnimplementedHandler) DeleteAPIV1User(ctx context.Context, req OptUser) (r DeleteAPIV1UserRes, _ error) {
+func (UnimplementedHandler) DeleteAPIV1User(ctx context.Context, req OptUser, params DeleteAPIV1UserParams) (r DeleteAPIV1UserRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -53,8 +53,8 @@ func (UnimplementedHandler) GetAPIV1User(ctx context.Context, params GetAPIV1Use
 //
 // Your GET endpoint.
 //
-// PATCH /api/v1/note
-func (UnimplementedHandler) ListAPIV1Note(ctx context.Context, req OptListAPIV1NoteReq) (r ListAPIV1NoteRes, _ error) {
+// GET /api/v1/note
+func (UnimplementedHandler) ListAPIV1Note(ctx context.Context, req OptListAPIV1NoteReq, params ListAPIV1NoteParams) (r ListAPIV1NoteRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -63,7 +63,7 @@ func (UnimplementedHandler) ListAPIV1Note(ctx context.Context, req OptListAPIV1N
 // Your POST endpoint.
 //
 // POST /api/v1/note
-func (UnimplementedHandler) PostAPIV1Note(ctx context.Context, req OptNote) (r PostAPIV1NoteRes, _ error) {
+func (UnimplementedHandler) PostAPIV1Note(ctx context.Context, req OptNote, params PostAPIV1NoteParams) (r PostAPIV1NoteRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -81,7 +81,7 @@ func (UnimplementedHandler) PostAPIV1User(ctx context.Context, req OptUser) (r P
 // Your POST endpoint.
 //
 // PUT /api/v1/note
-func (UnimplementedHandler) PutAPIV1Note(ctx context.Context, req OptNote) (r PutAPIV1NoteRes, _ error) {
+func (UnimplementedHandler) PutAPIV1Note(ctx context.Context, req OptNote, params PutAPIV1NoteParams) (r PutAPIV1NoteRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -90,6 +90,6 @@ func (UnimplementedHandler) PutAPIV1Note(ctx context.Context, req OptNote) (r Pu
 // Your POST endpoint.
 //
 // PUT /api/v1/user
-func (UnimplementedHandler) PutAPIV1User(ctx context.Context, req OptUser) (r PutAPIV1UserRes, _ error) {
+func (UnimplementedHandler) PutAPIV1User(ctx context.Context, req OptUser, params PutAPIV1UserParams) (r PutAPIV1UserRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
