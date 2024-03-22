@@ -6,9 +6,9 @@
 <div id="block_container">
     <b-navbar id="nav-block" type="dark" variant="dark">
       <b-navbar-nav>
-        <b-nav-item class="m-2 btn"><RouterLink to="/">Home</RouterLink></b-nav-item>
-        <b-nav-item class="m-2 btn"><RouterLink to="/calendar">Calendar</RouterLink></b-nav-item>
-        <b-nav-item class="m-2 btn"><RouterLink to="/user">User</RouterLink></b-nav-item>
+        <RouterLink class="m-2 btn" to="/">Home</RouterLink>
+        <RouterLink class="m-2 btn" to="/calendar">Calendar</RouterLink>
+        <RouterLink class="m-2 btn" to="/user">User</RouterLink>
       </b-navbar-nav>
     </b-navbar>
 </div>
