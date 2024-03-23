@@ -13,11 +13,13 @@ import Calendar from './Calendar.vue'
 import Register from './Register.vue'
 import App from './App.vue'
 import Main from './Main.vue'
+import User from './User.vue'
 
 const routes = [
     { path: '/', component: Main, name: 'Main' },
     { path: '/register', component: Register, name: 'Register' },
     { path: '/calendar', component: Calendar, name: 'Calendar' },
+    { path: '/user', component: User, name: 'User' },
 ]
   
 const router = createRouter({

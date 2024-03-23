@@ -26,7 +26,7 @@ let MONTH_FROM_CHRIST = ref(moment().year() * 12 + moment().month())
 
 let BACKEND_URL = 'http://localhost:1516'
 let global_notes = reactive([])
-let global_status = ref("nothing");
+let global_status = ref(null);
 let DatesArray = [];
 
 let global_note = reactive({
@@ -110,7 +110,7 @@ function Get(note) {
 function Post() {
   let apiClient = new ApiClient(BACKEND_URL);
   let defaultApi = new DefaultApi(apiClient);
-  let req = defaultApi.postApiV1Note({'note': global_note}, function (error, data, response) {
+  let req = defaultApi.postApiV1Note('', {'note': global_note}, function (error, data, response) {
     console.log(error, data, response)
     if(error != null) {
       global_status.value = "Failed: " + error;
@@ -209,7 +209,7 @@ function generateCalendar(month_from_christ) {
   </div>
 </main>
 
-<Modal title="Notes Window" width="70%" v-model:visible="isVisible" :okButton="{text: 'ok', onclick: () => {isWarningMessage = true; global_status = 'Loading...'; Post()}, loading: false}">
+<Modal title="Notes Window" width="70%" v-model:visible="isVisible" :okButton="{text: 'ok', onclick: () => {isWarningMessage = true; global_status = null; Post()}, loading: false}">
   <ul class="ul-popup">
     <form class="form-signin">
       <h2 class="form-signin-heading">Create Note</h2>
@@ -238,7 +238,10 @@ function generateCalendar(month_from_christ) {
   </ul>
 </Modal>
   <Modal title="Status Window" width="40%" v-model:visible="isWarningMessage" :okButton="{text: 'ok', onclick: () => {isWarningMessage = false}}">
-    {{ global_status }}
+    <div v-if="global_status == null" class="d-flex justify-content-center mb-3">
+      <b-spinner></b-spinner>
+    </div>
+    <p v-else>{{ global_status }}</p>
   </Modal>
 </template>
 <style scoped>

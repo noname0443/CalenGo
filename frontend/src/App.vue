@@ -1,19 +1,53 @@
 <script setup>
+import { ref } from 'vue';
+import ApiClient from './api/ApiClient';
+import DefaultApi from './api/api/DefaultApi';
+import VueCookies from 'vue-cookies'
+
+VueCookies.config('30d')
+VueCookies.config('7d','','',true)
+
+let isUser = ref(false);
+let BACKEND_URL = 'http://localhost:1516'
+
+function CheckUser() {
+  let apiClient = new ApiClient(BACKEND_URL);
+  let defaultApi = new DefaultApi(apiClient);
+
+  let credentials = VueCookies.get('credentials');
+  if (credentials === null) {
+    isUser.value = false;
+    return;
+  }
+  let strings = credentials.split(":");
+
+  let req = defaultApi.getApiV1User(strings[0], credentials, function (error, data, response) {
+    console.log(error, data, response)
+    if(error != null) {
+      isUser.value = false;
+    } else {
+      isUser.value = true;
+    }
+  });
+}
+
+CheckUser()
+// VueCookies.set('test', 'Hello world!', 3600 * 24 * 7);
 </script>
 
 <template>
-<body>
+<body class="main-body">
 <div id="block_container">
     <b-navbar id="nav-block" type="dark" variant="dark">
       <b-navbar-nav>
         <RouterLink class="m-2 btn" to="/">Home</RouterLink>
         <RouterLink class="m-2 btn" to="/calendar">Calendar</RouterLink>
-        <RouterLink class="m-2 btn" to="/user">User</RouterLink>
+        <RouterLink v-if="isUser" class="m-2 btn" to="/user">User</RouterLink>
+        <RouterLink v-else class="m-2 btn" to="/register">Register</RouterLink>
       </b-navbar-nav>
     </b-navbar>
 </div>
-<main>
-  <router-view v-slot="{ Component, route }">
+<router-view v-slot="{ Component, route }">
     <div id="wrapper">
       <Transition name="fade" mode="out-in">
         <div style="padding: 20px;" :key="route.name">
@@ -22,7 +56,6 @@
       </Transition>
     </div>
   </router-view>
-</main>
 </body>
 </template>
 
@@ -41,7 +74,9 @@ body {
 }
 
 #wrapper{
-  margin: 0 auto;
+  width: 90%;
+  height: 100%;
+  margin: auto;
   border-radius: 10px;
 }
 
