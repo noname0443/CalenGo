@@ -1,6 +1,7 @@
 <script setup>
 import { reactive, ref, toRaw } from 'vue';
 import moment from 'moment';
+import VueCookies from 'vue-cookies'
 
 import "./assets/form-app.css";
 import ApiClient from './api/ApiClient';
@@ -108,9 +109,19 @@ function Get(note) {
 }
 
 function Post() {
+  let credentials = VueCookies.get('credentials');
+  if (credentials === null) {
+    isUser.value = false;
+    return;
+  }
+  let strings = credentials.split(":");
+
   let apiClient = new ApiClient(BACKEND_URL);
+  apiClient.authentications['BasicAuth'].username = strings[0];
+  apiClient.authentications['BasicAuth'].password = strings[1];
+
   let defaultApi = new DefaultApi(apiClient);
-  let req = defaultApi.postApiV1Note('', {'note': global_note}, function (error, data, response) {
+  let req = defaultApi.postApiV1Note({'note': global_note}, function (error, data, response) {
     console.log(error, data, response)
     if(error != null) {
       global_status.value = "Failed: " + error;
@@ -127,7 +138,18 @@ function listNotes(start, end) {
   }
   global_note.startTime = start.format("YYYY-MM-DD")
   global_note.endTime = end.format("YYYY-MM-DD")
+
+  let credentials = VueCookies.get('credentials');
+  if (credentials === null) {
+    isUser.value = false;
+    return;
+  }
+  let strings = credentials.split(":");
+
   let apiClient = new ApiClient(BACKEND_URL);
+  apiClient.authentications['BasicAuth'].username = strings[0];
+  apiClient.authentications['BasicAuth'].password = strings[1];
+
   let defaultApi = new DefaultApi(apiClient);
 
   let ListReqStruct = new ListApiV1NoteRequest(global_note.startTime, global_note.endTime)

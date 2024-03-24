@@ -62,15 +62,49 @@ func (s *Server) handleDeleteAPIV1NoteRequest(args [0]string, argsEscaped bool, 
 			ID:   "delete-api-v1-note",
 		}
 	)
-	params, err := decodeDeleteAPIV1NoteParams(args, argsEscaped, r)
-	if err != nil {
-		err = &ogenerrors.DecodeParamsError{
-			OperationContext: opErrContext,
-			Err:              err,
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			sctx, ok, err := s.securityBasicAuth(ctx, "DeleteAPIV1Note", r)
+			if err != nil {
+				err = &ogenerrors.SecurityError{
+					OperationContext: opErrContext,
+					Security:         "BasicAuth",
+					Err:              err,
+				}
+				recordError("Security:BasicAuth", err)
+				s.cfg.ErrorHandler(ctx, w, r, err)
+				return
+			}
+			if ok {
+				satisfied[0] |= 1 << 0
+				ctx = sctx
+			}
 		}
-		recordError("DecodeParams", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
-		return
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			err = &ogenerrors.SecurityError{
+				OperationContext: opErrContext,
+				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
+			}
+			recordError("Security", err)
+			s.cfg.ErrorHandler(ctx, w, r, err)
+			return
+		}
 	}
 	request, close, err := s.decodeDeleteAPIV1NoteRequest(r)
 	if err != nil {
@@ -96,18 +130,13 @@ func (s *Server) handleDeleteAPIV1NoteRequest(args [0]string, argsEscaped bool, 
 			OperationSummary: "Your POST endpoint",
 			OperationID:      "delete-api-v1-note",
 			Body:             request,
-			Params: middleware.Parameters{
-				{
-					Name: "credentials",
-					In:   "cookie",
-				}: params.Credentials,
-			},
-			Raw: r,
+			Params:           middleware.Parameters{},
+			Raw:              r,
 		}
 
 		type (
 			Request  = OptNote
-			Params   = DeleteAPIV1NoteParams
+			Params   = struct{}
 			Response = DeleteAPIV1NoteRes
 		)
 		response, err = middleware.HookMiddleware[
@@ -117,14 +146,14 @@ func (s *Server) handleDeleteAPIV1NoteRequest(args [0]string, argsEscaped bool, 
 		](
 			m,
 			mreq,
-			unpackDeleteAPIV1NoteParams,
+			nil,
 			func(ctx context.Context, request Request, params Params) (response Response, err error) {
-				response, err = s.h.DeleteAPIV1Note(ctx, request, params)
+				response, err = s.h.DeleteAPIV1Note(ctx, request)
 				return response, err
 			},
 		)
 	} else {
-		response, err = s.h.DeleteAPIV1Note(ctx, request, params)
+		response, err = s.h.DeleteAPIV1Note(ctx, request)
 	}
 	if err != nil {
 		recordError("Internal", err)
@@ -183,16 +212,6 @@ func (s *Server) handleDeleteAPIV1UserRequest(args [0]string, argsEscaped bool, 
 			ID:   "delete-api-v1-user",
 		}
 	)
-	params, err := decodeDeleteAPIV1UserParams(args, argsEscaped, r)
-	if err != nil {
-		err = &ogenerrors.DecodeParamsError{
-			OperationContext: opErrContext,
-			Err:              err,
-		}
-		recordError("DecodeParams", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
-		return
-	}
 	request, close, err := s.decodeDeleteAPIV1UserRequest(r)
 	if err != nil {
 		err = &ogenerrors.DecodeRequestError{
@@ -217,18 +236,13 @@ func (s *Server) handleDeleteAPIV1UserRequest(args [0]string, argsEscaped bool, 
 			OperationSummary: "Your POST endpoint",
 			OperationID:      "delete-api-v1-user",
 			Body:             request,
-			Params: middleware.Parameters{
-				{
-					Name: "credentials",
-					In:   "cookie",
-				}: params.Credentials,
-			},
-			Raw: r,
+			Params:           middleware.Parameters{},
+			Raw:              r,
 		}
 
 		type (
 			Request  = OptUser
-			Params   = DeleteAPIV1UserParams
+			Params   = struct{}
 			Response = DeleteAPIV1UserRes
 		)
 		response, err = middleware.HookMiddleware[
@@ -238,14 +252,14 @@ func (s *Server) handleDeleteAPIV1UserRequest(args [0]string, argsEscaped bool, 
 		](
 			m,
 			mreq,
-			unpackDeleteAPIV1UserParams,
+			nil,
 			func(ctx context.Context, request Request, params Params) (response Response, err error) {
-				response, err = s.h.DeleteAPIV1User(ctx, request, params)
+				response, err = s.h.DeleteAPIV1User(ctx, request)
 				return response, err
 			},
 		)
 	} else {
-		response, err = s.h.DeleteAPIV1User(ctx, request, params)
+		response, err = s.h.DeleteAPIV1User(ctx, request)
 	}
 	if err != nil {
 		recordError("Internal", err)
@@ -304,6 +318,50 @@ func (s *Server) handleGetAPIV1NoteRequest(args [1]string, argsEscaped bool, w h
 			ID:   "get-api-v1-note",
 		}
 	)
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			sctx, ok, err := s.securityBasicAuth(ctx, "GetAPIV1Note", r)
+			if err != nil {
+				err = &ogenerrors.SecurityError{
+					OperationContext: opErrContext,
+					Security:         "BasicAuth",
+					Err:              err,
+				}
+				recordError("Security:BasicAuth", err)
+				s.cfg.ErrorHandler(ctx, w, r, err)
+				return
+			}
+			if ok {
+				satisfied[0] |= 1 << 0
+				ctx = sctx
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			err = &ogenerrors.SecurityError{
+				OperationContext: opErrContext,
+				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
+			}
+			recordError("Security", err)
+			s.cfg.ErrorHandler(ctx, w, r, err)
+			return
+		}
+	}
 	params, err := decodeGetAPIV1NoteParams(args, argsEscaped, r)
 	if err != nil {
 		err = &ogenerrors.DecodeParamsError{
@@ -328,10 +386,6 @@ func (s *Server) handleGetAPIV1NoteRequest(args [1]string, argsEscaped bool, w h
 					Name: "note",
 					In:   "path",
 				}: params.Note,
-				{
-					Name: "credentials",
-					In:   "cookie",
-				}: params.Credentials,
 			},
 			Raw: r,
 		}
@@ -414,6 +468,50 @@ func (s *Server) handleGetAPIV1UserRequest(args [1]string, argsEscaped bool, w h
 			ID:   "get-api-v1-user",
 		}
 	)
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			sctx, ok, err := s.securityBasicAuth(ctx, "GetAPIV1User", r)
+			if err != nil {
+				err = &ogenerrors.SecurityError{
+					OperationContext: opErrContext,
+					Security:         "BasicAuth",
+					Err:              err,
+				}
+				recordError("Security:BasicAuth", err)
+				s.cfg.ErrorHandler(ctx, w, r, err)
+				return
+			}
+			if ok {
+				satisfied[0] |= 1 << 0
+				ctx = sctx
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			err = &ogenerrors.SecurityError{
+				OperationContext: opErrContext,
+				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
+			}
+			recordError("Security", err)
+			s.cfg.ErrorHandler(ctx, w, r, err)
+			return
+		}
+	}
 	params, err := decodeGetAPIV1UserParams(args, argsEscaped, r)
 	if err != nil {
 		err = &ogenerrors.DecodeParamsError{
@@ -438,10 +536,6 @@ func (s *Server) handleGetAPIV1UserRequest(args [1]string, argsEscaped bool, w h
 					Name: "user",
 					In:   "path",
 				}: params.User,
-				{
-					Name: "credentials",
-					In:   "cookie",
-				}: params.Credentials,
 			},
 			Raw: r,
 		}
@@ -486,11 +580,11 @@ func (s *Server) handleGetAPIV1UserRequest(args [1]string, argsEscaped bool, w h
 //
 // Your GET endpoint.
 //
-// GET /api/v1/note
+// PATCH /api/v1/note
 func (s *Server) handleListAPIV1NoteRequest(args [0]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("list-api-v1-note"),
-		semconv.HTTPMethodKey.String("GET"),
+		semconv.HTTPMethodKey.String("PATCH"),
 		semconv.HTTPRouteKey.String("/api/v1/note"),
 	}
 
@@ -524,15 +618,49 @@ func (s *Server) handleListAPIV1NoteRequest(args [0]string, argsEscaped bool, w 
 			ID:   "list-api-v1-note",
 		}
 	)
-	params, err := decodeListAPIV1NoteParams(args, argsEscaped, r)
-	if err != nil {
-		err = &ogenerrors.DecodeParamsError{
-			OperationContext: opErrContext,
-			Err:              err,
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			sctx, ok, err := s.securityBasicAuth(ctx, "ListAPIV1Note", r)
+			if err != nil {
+				err = &ogenerrors.SecurityError{
+					OperationContext: opErrContext,
+					Security:         "BasicAuth",
+					Err:              err,
+				}
+				recordError("Security:BasicAuth", err)
+				s.cfg.ErrorHandler(ctx, w, r, err)
+				return
+			}
+			if ok {
+				satisfied[0] |= 1 << 0
+				ctx = sctx
+			}
 		}
-		recordError("DecodeParams", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
-		return
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			err = &ogenerrors.SecurityError{
+				OperationContext: opErrContext,
+				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
+			}
+			recordError("Security", err)
+			s.cfg.ErrorHandler(ctx, w, r, err)
+			return
+		}
 	}
 	request, close, err := s.decodeListAPIV1NoteRequest(r)
 	if err != nil {
@@ -558,18 +686,13 @@ func (s *Server) handleListAPIV1NoteRequest(args [0]string, argsEscaped bool, w 
 			OperationSummary: "Your GET endpoint",
 			OperationID:      "list-api-v1-note",
 			Body:             request,
-			Params: middleware.Parameters{
-				{
-					Name: "credentials",
-					In:   "cookie",
-				}: params.Credentials,
-			},
-			Raw: r,
+			Params:           middleware.Parameters{},
+			Raw:              r,
 		}
 
 		type (
 			Request  = OptListAPIV1NoteReq
-			Params   = ListAPIV1NoteParams
+			Params   = struct{}
 			Response = ListAPIV1NoteRes
 		)
 		response, err = middleware.HookMiddleware[
@@ -579,14 +702,14 @@ func (s *Server) handleListAPIV1NoteRequest(args [0]string, argsEscaped bool, w 
 		](
 			m,
 			mreq,
-			unpackListAPIV1NoteParams,
+			nil,
 			func(ctx context.Context, request Request, params Params) (response Response, err error) {
-				response, err = s.h.ListAPIV1Note(ctx, request, params)
+				response, err = s.h.ListAPIV1Note(ctx, request)
 				return response, err
 			},
 		)
 	} else {
-		response, err = s.h.ListAPIV1Note(ctx, request, params)
+		response, err = s.h.ListAPIV1Note(ctx, request)
 	}
 	if err != nil {
 		recordError("Internal", err)
@@ -645,15 +768,49 @@ func (s *Server) handlePostAPIV1NoteRequest(args [0]string, argsEscaped bool, w 
 			ID:   "post-api-v1-note",
 		}
 	)
-	params, err := decodePostAPIV1NoteParams(args, argsEscaped, r)
-	if err != nil {
-		err = &ogenerrors.DecodeParamsError{
-			OperationContext: opErrContext,
-			Err:              err,
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			sctx, ok, err := s.securityBasicAuth(ctx, "PostAPIV1Note", r)
+			if err != nil {
+				err = &ogenerrors.SecurityError{
+					OperationContext: opErrContext,
+					Security:         "BasicAuth",
+					Err:              err,
+				}
+				recordError("Security:BasicAuth", err)
+				s.cfg.ErrorHandler(ctx, w, r, err)
+				return
+			}
+			if ok {
+				satisfied[0] |= 1 << 0
+				ctx = sctx
+			}
 		}
-		recordError("DecodeParams", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
-		return
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			err = &ogenerrors.SecurityError{
+				OperationContext: opErrContext,
+				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
+			}
+			recordError("Security", err)
+			s.cfg.ErrorHandler(ctx, w, r, err)
+			return
+		}
 	}
 	request, close, err := s.decodePostAPIV1NoteRequest(r)
 	if err != nil {
@@ -679,18 +836,13 @@ func (s *Server) handlePostAPIV1NoteRequest(args [0]string, argsEscaped bool, w 
 			OperationSummary: "Your POST endpoint",
 			OperationID:      "post-api-v1-note",
 			Body:             request,
-			Params: middleware.Parameters{
-				{
-					Name: "credentials",
-					In:   "cookie",
-				}: params.Credentials,
-			},
-			Raw: r,
+			Params:           middleware.Parameters{},
+			Raw:              r,
 		}
 
 		type (
 			Request  = OptNote
-			Params   = PostAPIV1NoteParams
+			Params   = struct{}
 			Response = PostAPIV1NoteRes
 		)
 		response, err = middleware.HookMiddleware[
@@ -700,14 +852,14 @@ func (s *Server) handlePostAPIV1NoteRequest(args [0]string, argsEscaped bool, w 
 		](
 			m,
 			mreq,
-			unpackPostAPIV1NoteParams,
+			nil,
 			func(ctx context.Context, request Request, params Params) (response Response, err error) {
-				response, err = s.h.PostAPIV1Note(ctx, request, params)
+				response, err = s.h.PostAPIV1Note(ctx, request)
 				return response, err
 			},
 		)
 	} else {
-		response, err = s.h.PostAPIV1Note(ctx, request, params)
+		response, err = s.h.PostAPIV1Note(ctx, request)
 	}
 	if err != nil {
 		recordError("Internal", err)
@@ -872,15 +1024,49 @@ func (s *Server) handlePutAPIV1NoteRequest(args [0]string, argsEscaped bool, w h
 			ID:   "put-api-v1-note",
 		}
 	)
-	params, err := decodePutAPIV1NoteParams(args, argsEscaped, r)
-	if err != nil {
-		err = &ogenerrors.DecodeParamsError{
-			OperationContext: opErrContext,
-			Err:              err,
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			sctx, ok, err := s.securityBasicAuth(ctx, "PutAPIV1Note", r)
+			if err != nil {
+				err = &ogenerrors.SecurityError{
+					OperationContext: opErrContext,
+					Security:         "BasicAuth",
+					Err:              err,
+				}
+				recordError("Security:BasicAuth", err)
+				s.cfg.ErrorHandler(ctx, w, r, err)
+				return
+			}
+			if ok {
+				satisfied[0] |= 1 << 0
+				ctx = sctx
+			}
 		}
-		recordError("DecodeParams", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
-		return
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			err = &ogenerrors.SecurityError{
+				OperationContext: opErrContext,
+				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
+			}
+			recordError("Security", err)
+			s.cfg.ErrorHandler(ctx, w, r, err)
+			return
+		}
 	}
 	request, close, err := s.decodePutAPIV1NoteRequest(r)
 	if err != nil {
@@ -906,18 +1092,13 @@ func (s *Server) handlePutAPIV1NoteRequest(args [0]string, argsEscaped bool, w h
 			OperationSummary: "Your POST endpoint",
 			OperationID:      "put-api-v1-note",
 			Body:             request,
-			Params: middleware.Parameters{
-				{
-					Name: "credentials",
-					In:   "cookie",
-				}: params.Credentials,
-			},
-			Raw: r,
+			Params:           middleware.Parameters{},
+			Raw:              r,
 		}
 
 		type (
 			Request  = OptNote
-			Params   = PutAPIV1NoteParams
+			Params   = struct{}
 			Response = PutAPIV1NoteRes
 		)
 		response, err = middleware.HookMiddleware[
@@ -927,14 +1108,14 @@ func (s *Server) handlePutAPIV1NoteRequest(args [0]string, argsEscaped bool, w h
 		](
 			m,
 			mreq,
-			unpackPutAPIV1NoteParams,
+			nil,
 			func(ctx context.Context, request Request, params Params) (response Response, err error) {
-				response, err = s.h.PutAPIV1Note(ctx, request, params)
+				response, err = s.h.PutAPIV1Note(ctx, request)
 				return response, err
 			},
 		)
 	} else {
-		response, err = s.h.PutAPIV1Note(ctx, request, params)
+		response, err = s.h.PutAPIV1Note(ctx, request)
 	}
 	if err != nil {
 		recordError("Internal", err)
@@ -993,15 +1174,49 @@ func (s *Server) handlePutAPIV1UserRequest(args [0]string, argsEscaped bool, w h
 			ID:   "put-api-v1-user",
 		}
 	)
-	params, err := decodePutAPIV1UserParams(args, argsEscaped, r)
-	if err != nil {
-		err = &ogenerrors.DecodeParamsError{
-			OperationContext: opErrContext,
-			Err:              err,
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			sctx, ok, err := s.securityBasicAuth(ctx, "PutAPIV1User", r)
+			if err != nil {
+				err = &ogenerrors.SecurityError{
+					OperationContext: opErrContext,
+					Security:         "BasicAuth",
+					Err:              err,
+				}
+				recordError("Security:BasicAuth", err)
+				s.cfg.ErrorHandler(ctx, w, r, err)
+				return
+			}
+			if ok {
+				satisfied[0] |= 1 << 0
+				ctx = sctx
+			}
 		}
-		recordError("DecodeParams", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
-		return
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			err = &ogenerrors.SecurityError{
+				OperationContext: opErrContext,
+				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
+			}
+			recordError("Security", err)
+			s.cfg.ErrorHandler(ctx, w, r, err)
+			return
+		}
 	}
 	request, close, err := s.decodePutAPIV1UserRequest(r)
 	if err != nil {
@@ -1027,18 +1242,13 @@ func (s *Server) handlePutAPIV1UserRequest(args [0]string, argsEscaped bool, w h
 			OperationSummary: "Your POST endpoint",
 			OperationID:      "put-api-v1-user",
 			Body:             request,
-			Params: middleware.Parameters{
-				{
-					Name: "credentials",
-					In:   "cookie",
-				}: params.Credentials,
-			},
-			Raw: r,
+			Params:           middleware.Parameters{},
+			Raw:              r,
 		}
 
 		type (
 			Request  = OptUser
-			Params   = PutAPIV1UserParams
+			Params   = struct{}
 			Response = PutAPIV1UserRes
 		)
 		response, err = middleware.HookMiddleware[
@@ -1048,14 +1258,14 @@ func (s *Server) handlePutAPIV1UserRequest(args [0]string, argsEscaped bool, w h
 		](
 			m,
 			mreq,
-			unpackPutAPIV1UserParams,
+			nil,
 			func(ctx context.Context, request Request, params Params) (response Response, err error) {
-				response, err = s.h.PutAPIV1User(ctx, request, params)
+				response, err = s.h.PutAPIV1User(ctx, request)
 				return response, err
 			},
 		)
 	} else {
-		response, err = s.h.PutAPIV1User(ctx, request, params)
+		response, err = s.h.PutAPIV1User(ctx, request)
 	}
 	if err != nil {
 		recordError("Internal", err)

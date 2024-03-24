@@ -2,9 +2,6 @@ package internal
 
 import (
 	"context"
-	"errors"
-	"fmt"
-	"strings"
 
 	api "github.com/noname0443/CalenGo/backend/api"
 	"github.com/sirupsen/logrus"
@@ -20,9 +17,10 @@ func (app *App) GetAPIV1Note(ctx context.Context, params api.GetAPIV1NoteParams)
 	return &note, err
 }
 
-func (app *App) PostAPIV1Note(ctx context.Context, req api.OptNote, data api.PostAPIV1NoteParams) (api.PostAPIV1NoteRes, error) {
-	userId, _, err := app.GetUserByCredentials(data.Credentials)
-	logrus.Debug("PostAPIV1Note", req, data, err)
+func (app *App) PostAPIV1Note(ctx context.Context, req api.OptNote) (api.PostAPIV1NoteRes, error) {
+	auth := ctx.Value("credentials").(api.BasicAuth)
+	userId, _, err := app.GetUserByCredentials(auth)
+	logrus.Debug("PostAPIV1Note", req, auth, err)
 	if err != nil {
 		return &api.PostAPIV1NoteBadRequest{}, err
 	}
@@ -34,9 +32,15 @@ func (app *App) PostAPIV1Note(ctx context.Context, req api.OptNote, data api.Pos
 	return &api.PostAPIV1NoteOK{}, err
 }
 
-func (app *App) ListAPIV1Note(ctx context.Context, req api.OptListAPIV1NoteReq, data api.ListAPIV1NoteParams) (api.ListAPIV1NoteRes, error) {
+func (app *App) ListAPIV1Note(ctx context.Context, req api.OptListAPIV1NoteReq) (api.ListAPIV1NoteRes, error) {
+	auth := ctx.Value("credentials").(api.BasicAuth)
+	userId, _, err := app.GetUserByCredentials(auth)
+	if err != nil {
+		return &api.ListAPIV1NoteBadRequest{}, err
+	}
+
 	notes := []api.Note{}
-	err := app.db.Select(&notes, readNotesByTime, req.Value.StartTime, req.Value.EndTime)
+	err = app.db.Select(&notes, readNotesByTime, req.Value.StartTime, req.Value.EndTime, userId)
 	logrus.Debug("ListAPIV1Note", notes, req, err)
 	if err != nil {
 		return &api.ListAPIV1NoteBadRequest{}, err
@@ -52,33 +56,18 @@ func (app *App) PostAPIV1User(ctx context.Context, req api.OptUser) (api.PostAPI
 	if err != nil {
 		return &api.PostAPIV1UserBadRequest{}, err
 	}
-	return &api.PostAPIV1UserOK{
-		SetCookie: api.NewOptString(fmt.Sprintf("%s:%s", req.Value.Name, req.Value.Password)),
-	}, err
+	return &api.PostAPIV1UserOK{}, err
 }
 
 func (app *App) GetAPIV1User(ctx context.Context, params api.GetAPIV1UserParams) (api.GetAPIV1UserRes, error) {
-	logrus.Debug("GetAPIV1User", params)
-	strings := strings.Split(params.Credentials, ":")
-	if len(strings) != 2 {
-		return nil, errors.New("incorrect credentials")
-	}
-
-	if params.User != strings[0] {
-		return nil, errors.New("incorrect cookie's user or the user in request")
-	}
-	_, user, err := app.GetUserByCredentials(params.Credentials)
+	auth := ctx.Value("credentials").(api.BasicAuth)
+	logrus.Debug("GetAPIV1User", params, auth)
+	_, user, err := app.GetUserByCredentials(auth)
 	return user, err
 }
 
-func (app *App) GetUserByCredentials(credentials string) (int64, *api.User, error) {
-	strings := strings.Split(credentials, ":")
-	if len(strings) != 2 {
-		return 0, nil, errors.New("incorrect credentials")
-	}
-
-	username, password := strings[0], strings[1]
-	row := app.db.QueryRow(readUser, username, password)
+func (app *App) GetUserByCredentials(credentials api.BasicAuth) (int64, *api.User, error) {
+	row := app.db.QueryRow(readUser, credentials.Username, credentials.Password)
 
 	user := api.User{}
 	var num int64

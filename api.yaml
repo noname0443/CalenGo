@@ -1,6 +1,6 @@
 openapi: 3.1.0
 x-stoplight:
-  id: ll4cmuu17js47
+  id: kyv86omeutrhp
 info:
   title: CalenGo
   version: '1.0'
@@ -8,6 +8,8 @@ servers: []
 paths:
   '/api/v1/note/{note}':
     get:
+      security:
+        - BasicAuth: []
       summary: Your GET endpoint
       tags: []
       responses:
@@ -21,7 +23,7 @@ paths:
           description: Bad Request
       operationId: get-api-v1-note
       x-stoplight:
-        id: gm4ucylb4nhnn
+        id: ho4yimsfhex80
       x-internal: false
       parameters:
         - name: note
@@ -29,15 +31,10 @@ paths:
             type: string
           in: path
           required: true
-        - schema:
-            type: string
-          in: cookie
-          required: true
-          name: credentials
-          description: 'username:password'
-          deprecated: false
   /api/v1/note:
     post:
+      security:
+        - BasicAuth: []
       summary: Your POST endpoint
       tags: []
       responses:
@@ -47,21 +44,16 @@ paths:
           description: Bad Request
       operationId: post-api-v1-note
       x-stoplight:
-        id: q7ajxt7zp0hkd
+        id: scnt530gfp1wr
       requestBody:
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/Note'
-      parameters:
-        - schema:
-            type: string
-          in: cookie
-          required: true
-          name: credentials
-          description: 'username:password'
-          deprecated: false
+      parameters: []
     put:
+      security:
+        - BasicAuth: []
       summary: Your POST endpoint
       tags: []
       responses:
@@ -71,21 +63,16 @@ paths:
           description: Bad Request
       operationId: put-api-v1-note
       x-stoplight:
-        id: w5w7deyffsusv
+        id: v55qh58ya26ch
       requestBody:
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/Note'
-      parameters:
-        - schema:
-            type: string
-          in: cookie
-          required: true
-          name: credentials
-          description: 'username:password'
-          deprecated: false
+      parameters: []
     delete:
+      security:
+        - BasicAuth: []
       summary: Your POST endpoint
       tags: []
       responses:
@@ -95,21 +82,16 @@ paths:
           description: Bad Request
       operationId: delete-api-v1-note
       x-stoplight:
-        id: 7tcrrpw4gehv2
+        id: x605v0i649cnf
       requestBody:
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/Note'
-      parameters:
-        - schema:
-            type: string
-          in: cookie
-          required: true
-          name: credentials
-          description: 'username:password'
-          deprecated: false
-    get:
+      parameters: []
+    patch:
+      security:
+        - BasicAuth: []
       summary: Your GET endpoint
       tags: []
       responses:
@@ -122,12 +104,12 @@ paths:
                 items:
                   $ref: '#/components/schemas/Note'
                   x-stoplight:
-                    id: 3tyzm4ja1x5ul
+                    id: fzvhu0pec30is
         '400':
           description: Bad Request
       operationId: list-api-v1-note
       x-stoplight:
-        id: gbz745ic1txj2
+        id: b6kw93bcad9b7
       requestBody:
         content:
           application/json:
@@ -140,21 +122,16 @@ paths:
                 startTime:
                   type: string
                   x-stoplight:
-                    id: gxm9wi5mwv97r
+                    id: hn7yledguual5
                 endTime:
                   type: string
                   x-stoplight:
-                    id: j2zxbkozp1dvt
-      parameters:
-        - schema:
-            type: string
-          in: cookie
-          required: true
-          name: credentials
-          description: 'username:password'
-          deprecated: false
+                    id: yqtljllphf9wx
+      parameters: []
   '/api/v1/user/{user}':
     get:
+      security:
+        - BasicAuth: []
       summary: Your GET endpoint
       tags: []
       responses:
@@ -168,7 +145,7 @@ paths:
           description: Bad Request
       operationId: get-api-v1-user
       x-stoplight:
-        id: 4krcrn1o5mopx
+        id: jltqzwem9twl5
       x-internal: false
       parameters:
         - name: user
@@ -176,13 +153,6 @@ paths:
             type: string
           in: path
           required: true
-        - schema:
-            type: string
-          in: cookie
-          required: true
-          name: credentials
-          description: 'username:password'
-          deprecated: false
   /api/v1/user:
     post:
       summary: Your POST endpoint
@@ -190,16 +160,11 @@ paths:
       responses:
         '200':
           description: OK
-          headers:
-            Set-Cookie:
-              schema:
-                type: string
-                example: 'credentials=user:pass; Path=/; HttpOnly'
         '400':
           description: Bad Request
       operationId: post-api-v1-user
       x-stoplight:
-        id: exgfsx5vijha0
+        id: 8wk48xcvo5zxw
       requestBody:
         content:
           application/json:
@@ -207,6 +172,8 @@ paths:
               $ref: '#/components/schemas/User'
       parameters: []
     put:
+      security:
+        - BasicAuth: []
       summary: Your POST endpoint
       tags: []
       responses:
@@ -216,20 +183,13 @@ paths:
           description: Bad Request
       operationId: put-api-v1-user
       x-stoplight:
-        id: qsiq8gsaobkzf
+        id: dao0qiyhjj4r5
       requestBody:
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/User'
-      parameters:
-        - schema:
-            type: string
-          in: cookie
-          required: true
-          name: credentials
-          description: 'username:password'
-          deprecated: false
+      parameters: []
     delete:
       summary: Your POST endpoint
       tags: []
@@ -240,27 +200,24 @@ paths:
           description: Bad Request
       operationId: delete-api-v1-user
       x-stoplight:
-        id: cr47izhwwy6u0
+        id: 1niyz8w4gde1x
       requestBody:
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/User'
-      parameters:
-        - schema:
-            type: string
-          in: cookie
-          required: true
-          name: credentials
-          description: 'username:password'
-          deprecated: false
+      parameters: []
 components:
+  securitySchemes:
+    BasicAuth:
+      type: http
+      scheme: basic
   schemas:
     User:
       title: User
       type: object
       x-stoplight:
-        id: 16tdk57ybrz0j
+        id: t15cxa63lqsmu
       required:
         - name
         - password
@@ -268,19 +225,19 @@ components:
         name:
           type: string
           x-stoplight:
-            id: a684mzf3o3r7v
+            id: 4p2cygg8fj5gq
           x-oapi-codegen-extra-tags:
             db: name
         password:
           type: string
           x-stoplight:
-            id: x1zjmrpr4uu49
+            id: oj84mr4oak9ve
           x-oapi-codegen-extra-tags:
             db: password
     Note:
       title: Note
       x-stoplight:
-        id: sdtgqvkw44qm9
+        id: 4tmzl66n9aymk
       type: object
       required:
         - name
@@ -291,24 +248,25 @@ components:
         name:
           type: string
           x-stoplight:
-            id: tcr9iwep1csvp
+            id: gang5v8gpmm2o
           x-oapi-codegen-extra-tags:
             db: name
         description:
           type: string
           x-stoplight:
-            id: evf0kjbsxkoqa
+            id: grdf06u2i8me1
           x-oapi-codegen-extra-tags:
             db: description
         startTime:
           type: string
           x-stoplight:
-            id: brlnqtqete4fc
+            id: r6na1bfsjea5l
           x-oapi-codegen-extra-tags:
             db: start_time
         endTime:
           type: string
           x-stoplight:
-            id: 4u84jox7hpyws
+            id: fo4g30g8ggcd2
           x-oapi-codegen-extra-tags:
             db: end_time
+  parameters: {}

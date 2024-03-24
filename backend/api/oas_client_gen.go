@@ -17,6 +17,7 @@ import (
 
 	"github.com/ogen-go/ogen/conv"
 	ht "github.com/ogen-go/ogen/http"
+	"github.com/ogen-go/ogen/ogenerrors"
 	"github.com/ogen-go/ogen/otelogen"
 	"github.com/ogen-go/ogen/uri"
 )
@@ -28,13 +29,13 @@ type Invoker interface {
 	// Your POST endpoint.
 	//
 	// DELETE /api/v1/note
-	DeleteAPIV1Note(ctx context.Context, request OptNote, params DeleteAPIV1NoteParams) (DeleteAPIV1NoteRes, error)
+	DeleteAPIV1Note(ctx context.Context, request OptNote) (DeleteAPIV1NoteRes, error)
 	// DeleteAPIV1User invokes delete-api-v1-user operation.
 	//
 	// Your POST endpoint.
 	//
 	// DELETE /api/v1/user
-	DeleteAPIV1User(ctx context.Context, request OptUser, params DeleteAPIV1UserParams) (DeleteAPIV1UserRes, error)
+	DeleteAPIV1User(ctx context.Context, request OptUser) (DeleteAPIV1UserRes, error)
 	// GetAPIV1Note invokes get-api-v1-note operation.
 	//
 	// Your GET endpoint.
@@ -51,14 +52,14 @@ type Invoker interface {
 	//
 	// Your GET endpoint.
 	//
-	// GET /api/v1/note
-	ListAPIV1Note(ctx context.Context, request OptListAPIV1NoteReq, params ListAPIV1NoteParams) (ListAPIV1NoteRes, error)
+	// PATCH /api/v1/note
+	ListAPIV1Note(ctx context.Context, request OptListAPIV1NoteReq) (ListAPIV1NoteRes, error)
 	// PostAPIV1Note invokes post-api-v1-note operation.
 	//
 	// Your POST endpoint.
 	//
 	// POST /api/v1/note
-	PostAPIV1Note(ctx context.Context, request OptNote, params PostAPIV1NoteParams) (PostAPIV1NoteRes, error)
+	PostAPIV1Note(ctx context.Context, request OptNote) (PostAPIV1NoteRes, error)
 	// PostAPIV1User invokes post-api-v1-user operation.
 	//
 	// Your POST endpoint.
@@ -70,18 +71,19 @@ type Invoker interface {
 	// Your POST endpoint.
 	//
 	// PUT /api/v1/note
-	PutAPIV1Note(ctx context.Context, request OptNote, params PutAPIV1NoteParams) (PutAPIV1NoteRes, error)
+	PutAPIV1Note(ctx context.Context, request OptNote) (PutAPIV1NoteRes, error)
 	// PutAPIV1User invokes put-api-v1-user operation.
 	//
 	// Your POST endpoint.
 	//
 	// PUT /api/v1/user
-	PutAPIV1User(ctx context.Context, request OptUser, params PutAPIV1UserParams) (PutAPIV1UserRes, error)
+	PutAPIV1User(ctx context.Context, request OptUser) (PutAPIV1UserRes, error)
 }
 
 // Client implements OAS client.
 type Client struct {
 	serverURL *url.URL
+	sec       SecuritySource
 	baseClient
 }
 
@@ -95,7 +97,7 @@ func trimTrailingSlashes(u *url.URL) {
 }
 
 // NewClient initializes new Client defined by OAS.
-func NewClient(serverURL string, opts ...ClientOption) (*Client, error) {
+func NewClient(serverURL string, sec SecuritySource, opts ...ClientOption) (*Client, error) {
 	u, err := url.Parse(serverURL)
 	if err != nil {
 		return nil, err
@@ -108,6 +110,7 @@ func NewClient(serverURL string, opts ...ClientOption) (*Client, error) {
 	}
 	return &Client{
 		serverURL:  u,
+		sec:        sec,
 		baseClient: c,
 	}, nil
 }
@@ -132,12 +135,12 @@ func (c *Client) requestURL(ctx context.Context) *url.URL {
 // Your POST endpoint.
 //
 // DELETE /api/v1/note
-func (c *Client) DeleteAPIV1Note(ctx context.Context, request OptNote, params DeleteAPIV1NoteParams) (DeleteAPIV1NoteRes, error) {
-	res, err := c.sendDeleteAPIV1Note(ctx, request, params)
+func (c *Client) DeleteAPIV1Note(ctx context.Context, request OptNote) (DeleteAPIV1NoteRes, error) {
+	res, err := c.sendDeleteAPIV1Note(ctx, request)
 	return res, err
 }
 
-func (c *Client) sendDeleteAPIV1Note(ctx context.Context, request OptNote, params DeleteAPIV1NoteParams) (res DeleteAPIV1NoteRes, err error) {
+func (c *Client) sendDeleteAPIV1Note(ctx context.Context, request OptNote) (res DeleteAPIV1NoteRes, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("delete-api-v1-note"),
 		semconv.HTTPMethodKey.String("DELETE"),
@@ -186,19 +189,36 @@ func (c *Client) sendDeleteAPIV1Note(ctx context.Context, request OptNote, param
 		return res, errors.Wrap(err, "encode request")
 	}
 
-	stage = "EncodeCookieParams"
-	cookie := uri.NewCookieEncoder(r)
 	{
-		// Encode "credentials" parameter.
-		cfg := uri.CookieParameterEncodingConfig{
-			Name:    "credentials",
-			Explode: true,
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			stage = "Security:BasicAuth"
+			switch err := c.securityBasicAuth(ctx, "DeleteAPIV1Note", r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"BasicAuth\"")
+			}
 		}
 
-		if err := cookie.EncodeParam(cfg, func(e uri.Encoder) error {
-			return e.EncodeValue(conv.StringToString(params.Credentials))
-		}); err != nil {
-			return res, errors.Wrap(err, "encode cookie")
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
 		}
 	}
 
@@ -223,12 +243,12 @@ func (c *Client) sendDeleteAPIV1Note(ctx context.Context, request OptNote, param
 // Your POST endpoint.
 //
 // DELETE /api/v1/user
-func (c *Client) DeleteAPIV1User(ctx context.Context, request OptUser, params DeleteAPIV1UserParams) (DeleteAPIV1UserRes, error) {
-	res, err := c.sendDeleteAPIV1User(ctx, request, params)
+func (c *Client) DeleteAPIV1User(ctx context.Context, request OptUser) (DeleteAPIV1UserRes, error) {
+	res, err := c.sendDeleteAPIV1User(ctx, request)
 	return res, err
 }
 
-func (c *Client) sendDeleteAPIV1User(ctx context.Context, request OptUser, params DeleteAPIV1UserParams) (res DeleteAPIV1UserRes, err error) {
+func (c *Client) sendDeleteAPIV1User(ctx context.Context, request OptUser) (res DeleteAPIV1UserRes, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("delete-api-v1-user"),
 		semconv.HTTPMethodKey.String("DELETE"),
@@ -275,22 +295,6 @@ func (c *Client) sendDeleteAPIV1User(ctx context.Context, request OptUser, param
 	}
 	if err := encodeDeleteAPIV1UserRequest(request, r); err != nil {
 		return res, errors.Wrap(err, "encode request")
-	}
-
-	stage = "EncodeCookieParams"
-	cookie := uri.NewCookieEncoder(r)
-	{
-		// Encode "credentials" parameter.
-		cfg := uri.CookieParameterEncodingConfig{
-			Name:    "credentials",
-			Explode: true,
-		}
-
-		if err := cookie.EncodeParam(cfg, func(e uri.Encoder) error {
-			return e.EncodeValue(conv.StringToString(params.Credentials))
-		}); err != nil {
-			return res, errors.Wrap(err, "encode cookie")
-		}
 	}
 
 	stage = "SendRequest"
@@ -383,19 +387,36 @@ func (c *Client) sendGetAPIV1Note(ctx context.Context, params GetAPIV1NoteParams
 		return res, errors.Wrap(err, "create request")
 	}
 
-	stage = "EncodeCookieParams"
-	cookie := uri.NewCookieEncoder(r)
 	{
-		// Encode "credentials" parameter.
-		cfg := uri.CookieParameterEncodingConfig{
-			Name:    "credentials",
-			Explode: true,
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			stage = "Security:BasicAuth"
+			switch err := c.securityBasicAuth(ctx, "GetAPIV1Note", r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"BasicAuth\"")
+			}
 		}
 
-		if err := cookie.EncodeParam(cfg, func(e uri.Encoder) error {
-			return e.EncodeValue(conv.StringToString(params.Credentials))
-		}); err != nil {
-			return res, errors.Wrap(err, "encode cookie")
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
 		}
 	}
 
@@ -489,19 +510,36 @@ func (c *Client) sendGetAPIV1User(ctx context.Context, params GetAPIV1UserParams
 		return res, errors.Wrap(err, "create request")
 	}
 
-	stage = "EncodeCookieParams"
-	cookie := uri.NewCookieEncoder(r)
 	{
-		// Encode "credentials" parameter.
-		cfg := uri.CookieParameterEncodingConfig{
-			Name:    "credentials",
-			Explode: true,
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			stage = "Security:BasicAuth"
+			switch err := c.securityBasicAuth(ctx, "GetAPIV1User", r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"BasicAuth\"")
+			}
 		}
 
-		if err := cookie.EncodeParam(cfg, func(e uri.Encoder) error {
-			return e.EncodeValue(conv.StringToString(params.Credentials))
-		}); err != nil {
-			return res, errors.Wrap(err, "encode cookie")
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
 		}
 	}
 
@@ -525,16 +563,16 @@ func (c *Client) sendGetAPIV1User(ctx context.Context, params GetAPIV1UserParams
 //
 // Your GET endpoint.
 //
-// GET /api/v1/note
-func (c *Client) ListAPIV1Note(ctx context.Context, request OptListAPIV1NoteReq, params ListAPIV1NoteParams) (ListAPIV1NoteRes, error) {
-	res, err := c.sendListAPIV1Note(ctx, request, params)
+// PATCH /api/v1/note
+func (c *Client) ListAPIV1Note(ctx context.Context, request OptListAPIV1NoteReq) (ListAPIV1NoteRes, error) {
+	res, err := c.sendListAPIV1Note(ctx, request)
 	return res, err
 }
 
-func (c *Client) sendListAPIV1Note(ctx context.Context, request OptListAPIV1NoteReq, params ListAPIV1NoteParams) (res ListAPIV1NoteRes, err error) {
+func (c *Client) sendListAPIV1Note(ctx context.Context, request OptListAPIV1NoteReq) (res ListAPIV1NoteRes, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("list-api-v1-note"),
-		semconv.HTTPMethodKey.String("GET"),
+		semconv.HTTPMethodKey.String("PATCH"),
 		semconv.HTTPRouteKey.String("/api/v1/note"),
 	}
 
@@ -572,7 +610,7 @@ func (c *Client) sendListAPIV1Note(ctx context.Context, request OptListAPIV1Note
 	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "GET", u)
+	r, err := ht.NewRequest(ctx, "PATCH", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
@@ -580,19 +618,36 @@ func (c *Client) sendListAPIV1Note(ctx context.Context, request OptListAPIV1Note
 		return res, errors.Wrap(err, "encode request")
 	}
 
-	stage = "EncodeCookieParams"
-	cookie := uri.NewCookieEncoder(r)
 	{
-		// Encode "credentials" parameter.
-		cfg := uri.CookieParameterEncodingConfig{
-			Name:    "credentials",
-			Explode: true,
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			stage = "Security:BasicAuth"
+			switch err := c.securityBasicAuth(ctx, "ListAPIV1Note", r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"BasicAuth\"")
+			}
 		}
 
-		if err := cookie.EncodeParam(cfg, func(e uri.Encoder) error {
-			return e.EncodeValue(conv.StringToString(params.Credentials))
-		}); err != nil {
-			return res, errors.Wrap(err, "encode cookie")
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
 		}
 	}
 
@@ -617,12 +672,12 @@ func (c *Client) sendListAPIV1Note(ctx context.Context, request OptListAPIV1Note
 // Your POST endpoint.
 //
 // POST /api/v1/note
-func (c *Client) PostAPIV1Note(ctx context.Context, request OptNote, params PostAPIV1NoteParams) (PostAPIV1NoteRes, error) {
-	res, err := c.sendPostAPIV1Note(ctx, request, params)
+func (c *Client) PostAPIV1Note(ctx context.Context, request OptNote) (PostAPIV1NoteRes, error) {
+	res, err := c.sendPostAPIV1Note(ctx, request)
 	return res, err
 }
 
-func (c *Client) sendPostAPIV1Note(ctx context.Context, request OptNote, params PostAPIV1NoteParams) (res PostAPIV1NoteRes, err error) {
+func (c *Client) sendPostAPIV1Note(ctx context.Context, request OptNote) (res PostAPIV1NoteRes, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("post-api-v1-note"),
 		semconv.HTTPMethodKey.String("POST"),
@@ -671,19 +726,36 @@ func (c *Client) sendPostAPIV1Note(ctx context.Context, request OptNote, params 
 		return res, errors.Wrap(err, "encode request")
 	}
 
-	stage = "EncodeCookieParams"
-	cookie := uri.NewCookieEncoder(r)
 	{
-		// Encode "credentials" parameter.
-		cfg := uri.CookieParameterEncodingConfig{
-			Name:    "credentials",
-			Explode: true,
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			stage = "Security:BasicAuth"
+			switch err := c.securityBasicAuth(ctx, "PostAPIV1Note", r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"BasicAuth\"")
+			}
 		}
 
-		if err := cookie.EncodeParam(cfg, func(e uri.Encoder) error {
-			return e.EncodeValue(conv.StringToString(params.Credentials))
-		}); err != nil {
-			return res, errors.Wrap(err, "encode cookie")
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
 		}
 	}
 
@@ -783,12 +855,12 @@ func (c *Client) sendPostAPIV1User(ctx context.Context, request OptUser) (res Po
 // Your POST endpoint.
 //
 // PUT /api/v1/note
-func (c *Client) PutAPIV1Note(ctx context.Context, request OptNote, params PutAPIV1NoteParams) (PutAPIV1NoteRes, error) {
-	res, err := c.sendPutAPIV1Note(ctx, request, params)
+func (c *Client) PutAPIV1Note(ctx context.Context, request OptNote) (PutAPIV1NoteRes, error) {
+	res, err := c.sendPutAPIV1Note(ctx, request)
 	return res, err
 }
 
-func (c *Client) sendPutAPIV1Note(ctx context.Context, request OptNote, params PutAPIV1NoteParams) (res PutAPIV1NoteRes, err error) {
+func (c *Client) sendPutAPIV1Note(ctx context.Context, request OptNote) (res PutAPIV1NoteRes, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("put-api-v1-note"),
 		semconv.HTTPMethodKey.String("PUT"),
@@ -837,19 +909,36 @@ func (c *Client) sendPutAPIV1Note(ctx context.Context, request OptNote, params P
 		return res, errors.Wrap(err, "encode request")
 	}
 
-	stage = "EncodeCookieParams"
-	cookie := uri.NewCookieEncoder(r)
 	{
-		// Encode "credentials" parameter.
-		cfg := uri.CookieParameterEncodingConfig{
-			Name:    "credentials",
-			Explode: true,
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			stage = "Security:BasicAuth"
+			switch err := c.securityBasicAuth(ctx, "PutAPIV1Note", r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"BasicAuth\"")
+			}
 		}
 
-		if err := cookie.EncodeParam(cfg, func(e uri.Encoder) error {
-			return e.EncodeValue(conv.StringToString(params.Credentials))
-		}); err != nil {
-			return res, errors.Wrap(err, "encode cookie")
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
 		}
 	}
 
@@ -874,12 +963,12 @@ func (c *Client) sendPutAPIV1Note(ctx context.Context, request OptNote, params P
 // Your POST endpoint.
 //
 // PUT /api/v1/user
-func (c *Client) PutAPIV1User(ctx context.Context, request OptUser, params PutAPIV1UserParams) (PutAPIV1UserRes, error) {
-	res, err := c.sendPutAPIV1User(ctx, request, params)
+func (c *Client) PutAPIV1User(ctx context.Context, request OptUser) (PutAPIV1UserRes, error) {
+	res, err := c.sendPutAPIV1User(ctx, request)
 	return res, err
 }
 
-func (c *Client) sendPutAPIV1User(ctx context.Context, request OptUser, params PutAPIV1UserParams) (res PutAPIV1UserRes, err error) {
+func (c *Client) sendPutAPIV1User(ctx context.Context, request OptUser) (res PutAPIV1UserRes, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("put-api-v1-user"),
 		semconv.HTTPMethodKey.String("PUT"),
@@ -928,19 +1017,36 @@ func (c *Client) sendPutAPIV1User(ctx context.Context, request OptUser, params P
 		return res, errors.Wrap(err, "encode request")
 	}
 
-	stage = "EncodeCookieParams"
-	cookie := uri.NewCookieEncoder(r)
 	{
-		// Encode "credentials" parameter.
-		cfg := uri.CookieParameterEncodingConfig{
-			Name:    "credentials",
-			Explode: true,
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			stage = "Security:BasicAuth"
+			switch err := c.securityBasicAuth(ctx, "PutAPIV1User", r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"BasicAuth\"")
+			}
 		}
 
-		if err := cookie.EncodeParam(cfg, func(e uri.Encoder) error {
-			return e.EncodeValue(conv.StringToString(params.Credentials))
-		}); err != nil {
-			return res, errors.Wrap(err, "encode cookie")
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
 		}
 	}
 

@@ -9,9 +9,6 @@ import (
 	"github.com/go-faster/jx"
 	"go.opentelemetry.io/otel/codes"
 	"go.opentelemetry.io/otel/trace"
-
-	"github.com/ogen-go/ogen/conv"
-	"github.com/ogen-go/ogen/uri"
 )
 
 func encodeDeleteAPIV1NoteResponse(response DeleteAPIV1NoteRes, w http.ResponseWriter, span trace.Span) error {
@@ -152,25 +149,6 @@ func encodePostAPIV1NoteResponse(response PostAPIV1NoteRes, w http.ResponseWrite
 func encodePostAPIV1UserResponse(response PostAPIV1UserRes, w http.ResponseWriter, span trace.Span) error {
 	switch response := response.(type) {
 	case *PostAPIV1UserOK:
-		// Encoding response headers.
-		{
-			h := uri.NewHeaderEncoder(w.Header())
-			// Encode "Set-Cookie" header.
-			{
-				cfg := uri.HeaderParameterEncodingConfig{
-					Name:    "Set-Cookie",
-					Explode: false,
-				}
-				if err := h.EncodeParam(cfg, func(e uri.Encoder) error {
-					if val, ok := response.SetCookie.Get(); ok {
-						return e.EncodeValue(conv.StringToString(val))
-					}
-					return nil
-				}); err != nil {
-					return errors.Wrap(err, "encode Set-Cookie header")
-				}
-			}
-		}
 		w.WriteHeader(200)
 		span.SetStatus(codes.Ok, http.StatusText(200))
 

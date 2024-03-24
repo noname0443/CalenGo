@@ -11,9 +11,6 @@ let isUser = ref(false);
 let BACKEND_URL = 'http://localhost:1516'
 
 function CheckUser() {
-  let apiClient = new ApiClient(BACKEND_URL);
-  let defaultApi = new DefaultApi(apiClient);
-
   let credentials = VueCookies.get('credentials');
   if (credentials === null) {
     isUser.value = false;
@@ -21,7 +18,13 @@ function CheckUser() {
   }
   let strings = credentials.split(":");
 
-  let req = defaultApi.getApiV1User(strings[0], credentials, function (error, data, response) {
+  let apiClient = new ApiClient(BACKEND_URL);
+  apiClient.authentications['BasicAuth'].username = strings[0];
+  apiClient.authentications['BasicAuth'].password = strings[1];
+
+  let defaultApi = new DefaultApi(apiClient);
+
+  let req = defaultApi.getApiV1User(strings[0], function (error, data, response) {
     console.log(error, data, response)
     if(error != null) {
       isUser.value = false;

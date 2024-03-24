@@ -10,9 +10,7 @@ import (
 	"github.com/go-faster/errors"
 	"github.com/go-faster/jx"
 
-	"github.com/ogen-go/ogen/conv"
 	"github.com/ogen-go/ogen/ogenerrors"
-	"github.com/ogen-go/ogen/uri"
 	"github.com/ogen-go/ogen/validate"
 )
 
@@ -197,46 +195,7 @@ func decodePostAPIV1UserResponse(resp *http.Response) (res PostAPIV1UserRes, _ e
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
-		var wrapper PostAPIV1UserOK
-		h := uri.NewHeaderDecoder(resp.Header)
-		// Parse "Set-Cookie" header.
-		{
-			cfg := uri.HeaderParameterDecodingConfig{
-				Name:    "Set-Cookie",
-				Explode: false,
-			}
-			if err := func() error {
-				if err := h.HasParam(cfg); err == nil {
-					if err := h.DecodeParam(cfg, func(d uri.Decoder) error {
-						var wrapperDotSetCookieVal string
-						if err := func() error {
-							val, err := d.DecodeValue()
-							if err != nil {
-								return err
-							}
-
-							c, err := conv.ToString(val)
-							if err != nil {
-								return err
-							}
-
-							wrapperDotSetCookieVal = c
-							return nil
-						}(); err != nil {
-							return err
-						}
-						wrapper.SetCookie.SetTo(wrapperDotSetCookieVal)
-						return nil
-					}); err != nil {
-						return err
-					}
-				}
-				return nil
-			}(); err != nil {
-				return res, errors.Wrap(err, "parse Set-Cookie header")
-			}
-		}
-		return &wrapper, nil
+		return &PostAPIV1UserOK{}, nil
 	case 400:
 		// Code 400.
 		return &PostAPIV1UserBadRequest{}, nil
