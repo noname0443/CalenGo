@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"reflect"
+	"strings"
 
 	"github.com/cucumber/godog"
 	docker "github.com/fsouza/go-dockerclient"
@@ -18,8 +19,13 @@ import (
 
 type FeatureManager struct {
 	lastResult   interface{}
+	Credentials  api.BasicAuth
 	ip           string
 	DockerClient *docker.Client
+}
+
+func (fm *FeatureManager) BasicAuth(ctx context.Context, operationName string) (api.BasicAuth, error) {
+	return fm.Credentials, nil
 }
 
 func NewFeatureManager() (*FeatureManager, error) {
@@ -106,8 +112,18 @@ func (fm *FeatureManager) StepIsWorkingOn(ctx context.Context) (context.Context,
 	return ctx, nil
 }
 
+func (fm *FeatureManager) StepSetCredentials(ctx context.Context, credentials string) (context.Context, error) {
+	strings := strings.Split(credentials, ":")
+	if len(strings) != 2 {
+		return ctx, errors.New("incorrect credentials")
+	}
+	fm.Credentials.Username = strings[0]
+	fm.Credentials.Password = strings[1]
+	return ctx, nil
+}
+
 func (fm *FeatureManager) StepGetNote(ctx context.Context, note string) (context.Context, error) {
-	client, err := api.NewClient(fmt.Sprintf("http://%s", fm.ip), []api.ClientOption{}...)
+	client, err := api.NewClient(fmt.Sprintf("http://%s", fm.ip), fm, []api.ClientOption{}...)
 	if err != nil {
 		return ctx, err
 	}
@@ -125,7 +141,7 @@ func (fm *FeatureManager) StepGetNote(ctx context.Context, note string) (context
 }
 
 func (fm *FeatureManager) StepPostNote(ctx context.Context, data *godog.DocString) (context.Context, error) {
-	client, err := api.NewClient(fmt.Sprintf("http://%s", fm.ip), []api.ClientOption{}...)
+	client, err := api.NewClient(fmt.Sprintf("http://%s", fm.ip), fm, []api.ClientOption{}...)
 	if err != nil {
 		return ctx, err
 	}
@@ -147,7 +163,7 @@ func (fm *FeatureManager) StepPostNote(ctx context.Context, data *godog.DocStrin
 }
 
 func (fm *FeatureManager) StepPutNote(ctx context.Context, data *godog.DocString) (context.Context, error) {
-	client, err := api.NewClient(fmt.Sprintf("http://%s", fm.ip), []api.ClientOption{}...)
+	client, err := api.NewClient(fmt.Sprintf("http://%s", fm.ip), fm, []api.ClientOption{}...)
 	if err != nil {
 		return ctx, err
 	}
@@ -169,7 +185,7 @@ func (fm *FeatureManager) StepPutNote(ctx context.Context, data *godog.DocString
 }
 
 func (fm *FeatureManager) StepDeleteNote(ctx context.Context, data *godog.DocString) (context.Context, error) {
-	client, err := api.NewClient(fmt.Sprintf("http://%s", fm.ip), []api.ClientOption{}...)
+	client, err := api.NewClient(fmt.Sprintf("http://%s", fm.ip), fm, []api.ClientOption{}...)
 	if err != nil {
 		return ctx, err
 	}
@@ -191,7 +207,7 @@ func (fm *FeatureManager) StepDeleteNote(ctx context.Context, data *godog.DocStr
 }
 
 func (fm *FeatureManager) StepListNotes(ctx context.Context, start string, end string) (context.Context, error) {
-	client, err := api.NewClient(fmt.Sprintf("http://%s", fm.ip), []api.ClientOption{}...)
+	client, err := api.NewClient(fmt.Sprintf("http://%s", fm.ip), fm, []api.ClientOption{}...)
 	if err != nil {
 		return ctx, err
 	}
@@ -210,7 +226,7 @@ func (fm *FeatureManager) StepListNotes(ctx context.Context, start string, end s
 }
 
 func (fm *FeatureManager) StepGetUser(ctx context.Context, user string) (context.Context, error) {
-	client, err := api.NewClient(fmt.Sprintf("http://%s", fm.ip), []api.ClientOption{}...)
+	client, err := api.NewClient(fmt.Sprintf("http://%s", fm.ip), fm, []api.ClientOption{}...)
 	if err != nil {
 		return ctx, err
 	}
@@ -228,7 +244,7 @@ func (fm *FeatureManager) StepGetUser(ctx context.Context, user string) (context
 }
 
 func (fm *FeatureManager) StepPostUser(ctx context.Context, data *godog.DocString) (context.Context, error) {
-	client, err := api.NewClient(fmt.Sprintf("http://%s", fm.ip), []api.ClientOption{}...)
+	client, err := api.NewClient(fmt.Sprintf("http://%s", fm.ip), fm, []api.ClientOption{}...)
 	if err != nil {
 		return ctx, err
 	}
@@ -250,7 +266,7 @@ func (fm *FeatureManager) StepPostUser(ctx context.Context, data *godog.DocStrin
 }
 
 func (fm *FeatureManager) StepPutUser(ctx context.Context, data *godog.DocString) (context.Context, error) {
-	client, err := api.NewClient(fmt.Sprintf("http://%s", fm.ip), []api.ClientOption{}...)
+	client, err := api.NewClient(fmt.Sprintf("http://%s", fm.ip), fm, []api.ClientOption{}...)
 	if err != nil {
 		return ctx, err
 	}
@@ -272,7 +288,7 @@ func (fm *FeatureManager) StepPutUser(ctx context.Context, data *godog.DocString
 }
 
 func (fm *FeatureManager) StepDeleteUser(ctx context.Context, data *godog.DocString) (context.Context, error) {
-	client, err := api.NewClient(fmt.Sprintf("http://%s", fm.ip), []api.ClientOption{}...)
+	client, err := api.NewClient(fmt.Sprintf("http://%s", fm.ip), fm, []api.ClientOption{}...)
 	if err != nil {
 		return ctx, err
 	}

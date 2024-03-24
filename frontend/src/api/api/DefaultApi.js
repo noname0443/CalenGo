@@ -63,7 +63,7 @@ export default class DefaultApi {
       let formParams = {
       };
 
-      let authNames = [];
+      let authNames = ['BasicAuth'];
       let contentTypes = ['application/json'];
       let accepts = [];
       let returnType = null;
@@ -143,7 +143,7 @@ export default class DefaultApi {
       let formParams = {
       };
 
-      let authNames = [];
+      let authNames = ['BasicAuth'];
       let contentTypes = [];
       let accepts = ['application/json'];
       let returnType = Note;
@@ -185,7 +185,7 @@ export default class DefaultApi {
       let formParams = {
       };
 
-      let authNames = [];
+      let authNames = ['BasicAuth'];
       let contentTypes = [];
       let accepts = ['application/json'];
       let returnType = User;
@@ -224,7 +224,7 @@ export default class DefaultApi {
       let formParams = {
       };
 
-      let authNames = [];
+      let authNames = ['BasicAuth'];
       let contentTypes = ['application/json'];
       let accepts = ['application/json'];
       let returnType = [Note];
@@ -262,7 +262,7 @@ export default class DefaultApi {
       let formParams = {
       };
 
-      let authNames = [];
+      let authNames = ['BasicAuth'];
       let contentTypes = ['application/json'];
       let accepts = [];
       let returnType = null;
@@ -338,7 +338,7 @@ export default class DefaultApi {
       let formParams = {
       };
 
-      let authNames = [];
+      let authNames = ['BasicAuth'];
       let contentTypes = ['application/json'];
       let accepts = [];
       let returnType = null;
@@ -376,7 +376,7 @@ export default class DefaultApi {
       let formParams = {
       };
 
-      let authNames = [];
+      let authNames = ['BasicAuth'];
       let contentTypes = ['application/json'];
       let accepts = [];
       let returnType = null;

@@ -23,7 +23,7 @@ func NewApp(port string, db *sqlx.DB) *App {
 }
 
 func (app *App) Run() {
-	serv, err := api.NewServer(app, []api.ServerOption{}...)
+	serv, err := api.NewServer(app, &SenHandler{}, []api.ServerOption{}...)
 	if err != nil {
 		logrus.Fatal(err)
 	}
@@ -33,7 +33,7 @@ func (app *App) Run() {
 		AllowedOrigins:   []string{"*"},
 		AllowCredentials: true,
 		Debug:            true,
-		AllowedHeaders:   []string{"User-Agent", "Content-Type"},
+		AllowedHeaders:   []string{"User-Agent", "Content-Type", "Authorization"},
 	})
 
 	logrus.Info("Server starting!")

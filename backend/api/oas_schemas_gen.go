@@ -2,6 +2,31 @@
 
 package api
 
+type BasicAuth struct {
+	Username string
+	Password string
+}
+
+// GetUsername returns the value of Username.
+func (s *BasicAuth) GetUsername() string {
+	return s.Username
+}
+
+// GetPassword returns the value of Password.
+func (s *BasicAuth) GetPassword() string {
+	return s.Password
+}
+
+// SetUsername sets the value of Username.
+func (s *BasicAuth) SetUsername(val string) {
+	s.Username = val
+}
+
+// SetPassword sets the value of Password.
+func (s *BasicAuth) SetPassword(val string) {
+	s.Password = val
+}
+
 // DeleteAPIV1NoteBadRequest is response for DeleteAPIV1Note operation.
 type DeleteAPIV1NoteBadRequest struct{}
 
