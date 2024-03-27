@@ -27,6 +27,40 @@ func (s *BasicAuth) SetPassword(val string) {
 	s.Password = val
 }
 
+// ConflictAPIV1BadRequest is response for ConflictAPIV1 operation.
+type ConflictAPIV1BadRequest struct{}
+
+func (*ConflictAPIV1BadRequest) conflictAPIV1Res() {}
+
+type ConflictAPIV1OKApplicationJSON []ConflictAPIV1OKItem
+
+func (*ConflictAPIV1OKApplicationJSON) conflictAPIV1Res() {}
+
+type ConflictAPIV1OKItem struct {
+	First  Note `json:"first"`
+	Second Note `json:"second"`
+}
+
+// GetFirst returns the value of First.
+func (s *ConflictAPIV1OKItem) GetFirst() Note {
+	return s.First
+}
+
+// GetSecond returns the value of Second.
+func (s *ConflictAPIV1OKItem) GetSecond() Note {
+	return s.Second
+}
+
+// SetFirst sets the value of First.
+func (s *ConflictAPIV1OKItem) SetFirst(val Note) {
+	s.First = val
+}
+
+// SetSecond sets the value of Second.
+func (s *ConflictAPIV1OKItem) SetSecond(val Note) {
+	s.Second = val
+}
+
 // DeleteAPIV1NoteBadRequest is response for DeleteAPIV1Note operation.
 type DeleteAPIV1NoteBadRequest struct{}
 

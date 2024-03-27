@@ -13,6 +13,15 @@ type UnimplementedHandler struct{}
 
 var _ Handler = UnimplementedHandler{}
 
+// ConflictAPIV1 implements conflict-api-v1 operation.
+//
+// Your GET endpoint.
+//
+// GET /api/v1/conflict
+func (UnimplementedHandler) ConflictAPIV1(ctx context.Context) (r ConflictAPIV1Res, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
 // DeleteAPIV1Note implements delete-api-v1-note operation.
 //
 // Your POST endpoint.
