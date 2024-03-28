@@ -6,6 +6,14 @@ import (
 	"github.com/go-faster/errors"
 )
 
+func (s ConflictAPIV1OKApplicationJSON) Validate() error {
+	alias := ([]ConflictAPIV1OKItem)(s)
+	if alias == nil {
+		return errors.New("nil is invalid value")
+	}
+	return nil
+}
+
 func (s ListAPIV1NoteOKApplicationJSON) Validate() error {
 	alias := ([]Note)(s)
 	if alias == nil {

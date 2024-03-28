@@ -63,6 +63,7 @@ func InitializeScenario(fm *FeatureManager, sc *godog.ScenarioContext) {
 	sc.Step(`^I POST user /api/v1/user$`, fm.StepPostUser)
 	sc.Step(`^I PUT user /api/v1/user$`, fm.StepPutUser)
 	sc.Step(`^I DELETE user /api/v1/user$`, fm.StepDeleteUser)
+	sc.Step(`^I GET /api/v1/conflict$`, fm.StepGetConflicts)
 
 	sc.Step(`^I got line "([^"]*)"$`, fm.iGotLine)
 	sc.Step(`^I got data$`, fm.iGotData)

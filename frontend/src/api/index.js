@@ -13,6 +13,7 @@
 
 
 import ApiClient from './ApiClient';
+import ConflictApiV1200ResponseInner from './model/ConflictApiV1200ResponseInner';
 import ListApiV1NoteRequest from './model/ListApiV1NoteRequest';
 import Note from './model/Note';
 import User from './model/User';
@@ -56,6 +57,12 @@ export {
      * @property {module:ApiClient}
      */
     ApiClient,
+
+    /**
+     * The ConflictApiV1200ResponseInner model constructor.
+     * @property {module:model/ConflictApiV1200ResponseInner}
+     */
+    ConflictApiV1200ResponseInner,
 
     /**
      * The ListApiV1NoteRequest model constructor.

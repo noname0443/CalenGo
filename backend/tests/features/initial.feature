@@ -74,6 +74,167 @@ Feature: Start Server
         ]
         """
 
+    Scenario: Create conflict
+        When I POST note /api/v1/note
+        """
+        {
+            "name": "note3",
+            "description": "note1",
+            "startTime": "2009-02-05",
+            "endTime": "2009-02-06"
+        }
+        """
+        Then I got no error
+
+        When I POST note /api/v1/note
+        """
+        {
+            "name": "note4",
+            "description": "note1",
+            "startTime": "2009-02-06",
+            "endTime": "2009-02-07"
+        }
+        """
+        Then I got no error
+        
+        When I GET /api/v1/conflict
+        Then I got data
+        """
+        [
+            {
+                "first": {
+                    "name": "note3",
+                    "description": "note1",
+                    "startTime": "2009-02-05",
+                    "endTime": "2009-02-06"
+                },
+                "second": {
+                    "name": "note4",
+                    "description": "note1",
+                    "startTime": "2009-02-06",
+                    "endTime": "2009-02-07"
+                }
+            },
+            {
+                "first": {
+                    "name": "note4",
+                    "description": "note1",
+                    "startTime": "2009-02-06",
+                    "endTime": "2009-02-07"
+                },
+                "second": {
+                    "name": "note3",
+                    "description": "note1",
+                    "startTime": "2009-02-05",
+                    "endTime": "2009-02-06"
+                }
+            }
+        ]
+        """
+
+        When I POST note /api/v1/note
+        """
+        {
+            "name": "note5",
+            "description": "note1",
+            "startTime": "2009-02-06",
+            "endTime": "2009-02-06"
+        }
+        """
+        Then I got no error
+
+        When I GET /api/v1/conflict
+        Then I got data
+        """
+        [
+            {
+                "first": {
+                    "name": "note3",
+                    "description": "note1",
+                    "startTime": "2009-02-05",
+                    "endTime": "2009-02-06"
+                },
+                "second": {
+                    "name": "note4",
+                    "description": "note1",
+                    "startTime": "2009-02-06",
+                    "endTime": "2009-02-07"
+                }
+            },
+            {
+                "first": {
+                    "name": "note3",
+                    "description": "note1",
+                    "startTime": "2009-02-05",
+                    "endTime": "2009-02-06"
+                },
+                "second": {
+                    "name": "note5",
+                    "description": "note1",
+                    "startTime": "2009-02-06",
+                    "endTime": "2009-02-06"
+                }
+            },
+            {
+                "first": {
+                    "name": "note4",
+                    "description": "note1",
+                    "startTime": "2009-02-06",
+                    "endTime": "2009-02-07"
+                },
+                "second": {
+                    "name": "note3",
+                    "description": "note1",
+                    "startTime": "2009-02-05",
+                    "endTime": "2009-02-06"
+                }
+            },
+            {
+                "first": {
+                    "name": "note4",
+                    "description": "note1",
+                    "startTime": "2009-02-06",
+                    "endTime": "2009-02-07"
+                },
+                "second": {
+                    "name": "note5",
+                    "description": "note1",
+                    "startTime": "2009-02-06",
+                    "endTime": "2009-02-06"
+                }
+            },
+            {
+                "first": {
+                    "name": "note5",
+                    "description": "note1",
+                    "startTime": "2009-02-06",
+                    "endTime": "2009-02-06"
+                },
+                "second": {
+                    "name": "note3",
+                    "description": "note1",
+                    "startTime": "2009-02-05",
+                    "endTime": "2009-02-06"
+                }
+            },
+            {
+                "first": {
+                    "name": "note5",
+                    "description": "note1",
+                    "startTime": "2009-02-06",
+                    "endTime": "2009-02-06"
+                },
+                "second": {
+                    "name": "note4",
+                    "description": "note1",
+                    "startTime": "2009-02-06",
+                    "endTime": "2009-02-07"
+                }
+            }
+        ]
+        """
+
+    Scenario: Unimplemented Operations
         When I PUT note /api/v1/note
         """
         {
@@ -96,7 +257,6 @@ Feature: Start Server
         """
         Then I got line "decode response: unexpected status code: 501"
 
-    Scenario: User handler tests
         When I PUT user /api/v1/user
         """
         {

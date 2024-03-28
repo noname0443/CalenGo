@@ -13,6 +13,7 @@
 
 
 import ApiClient from "../ApiClient";
+import ConflictApiV1200ResponseInner from '../model/ConflictApiV1200ResponseInner';
 import ListApiV1NoteRequest from '../model/ListApiV1NoteRequest';
 import Note from '../model/Note';
 import User from '../model/User';
@@ -35,6 +36,42 @@ export default class DefaultApi {
         this.apiClient = apiClient || ApiClient.instance;
     }
 
+
+    /**
+     * Callback function to receive the result of the conflictApiV1 operation.
+     * @callback module:api/DefaultApi~conflictApiV1Callback
+     * @param {String} error Error message, if any.
+     * @param {Array.<module:model/ConflictApiV1200ResponseInner>} data The data returned by the service call.
+     * @param {String} response The complete HTTP response.
+     */
+
+    /**
+     * Your GET endpoint
+     * @param {module:api/DefaultApi~conflictApiV1Callback} callback The callback function, accepting three arguments: error, data, response
+     * data is of type: {@link Array.<module:model/ConflictApiV1200ResponseInner>}
+     */
+    conflictApiV1(callback) {
+      let postBody = null;
+
+      let pathParams = {
+      };
+      let queryParams = {
+      };
+      let headerParams = {
+      };
+      let formParams = {
+      };
+
+      let authNames = ['BasicAuth'];
+      let contentTypes = [];
+      let accepts = ['application/json'];
+      let returnType = [ConflictApiV1200ResponseInner];
+      return this.apiClient.callApi(
+        '/api/v1/conflict', 'GET',
+        pathParams, queryParams, headerParams, formParams, postBody,
+        authNames, contentTypes, accepts, returnType, null, callback
+      );
+    }
 
     /**
      * Callback function to receive the result of the deleteApiV1Note operation.

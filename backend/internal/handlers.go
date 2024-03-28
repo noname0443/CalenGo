@@ -2,6 +2,7 @@ package internal
 
 import (
 	"context"
+	"errors"
 
 	api "github.com/noname0443/CalenGo/backend/api"
 	"github.com/sirupsen/logrus"
@@ -18,6 +19,9 @@ func (app *App) GetAPIV1Note(ctx context.Context, params api.GetAPIV1NoteParams)
 }
 
 func (app *App) PostAPIV1Note(ctx context.Context, req api.OptNote) (api.PostAPIV1NoteRes, error) {
+	if req.Value.Name == "" {
+		return &api.PostAPIV1NoteBadRequest{}, errors.New("name is empty")
+	}
 	auth := ctx.Value("credentials").(api.BasicAuth)
 	userId, _, err := app.GetUserByCredentials(auth)
 	logrus.Debug("PostAPIV1Note", req, auth, err)
@@ -73,4 +77,38 @@ func (app *App) GetUserByCredentials(credentials api.BasicAuth) (int64, *api.Use
 	var num int64
 	err := row.Scan(&num, &user.Name, &user.Password)
 	return num, &user, err
+}
+
+func (app *App) ConflictAPIV1(ctx context.Context) (api.ConflictAPIV1Res, error) {
+	auth := ctx.Value("credentials").(api.BasicAuth)
+	logrus.Debug("ConflictAPIV1", auth)
+	id, _, err := app.GetUserByCredentials(auth)
+	if err != nil {
+		logrus.Debug("ConflictAPIV1", err)
+		return &api.ConflictAPIV1BadRequest{}, err
+	}
+
+	rows, err := app.db.Query(readConflictedNotes, id)
+	if err != nil {
+		logrus.Debug("ConflictAPIV1", err)
+		return &api.ConflictAPIV1BadRequest{}, err
+	}
+
+	items := make([]api.ConflictAPIV1OKItem, 0)
+	for rows.Next() {
+		first, second := api.Note{}, api.Note{}
+		err = rows.Scan(&first.Name, &first.Description, &first.StartTime, &first.EndTime, &second.Name, &second.Description, &second.StartTime, &second.EndTime)
+		if err != nil {
+			logrus.Debug("ConflictAPIV1", err)
+			return &api.ConflictAPIV1BadRequest{}, err
+		}
+		items = append(items, api.ConflictAPIV1OKItem{
+			First:  first,
+			Second: second,
+		})
+	}
+
+	logrus.Debug("ConflictAPIV1", items, err)
+	resp := api.ConflictAPIV1OKApplicationJSON(items)
+	return &resp, err
 }

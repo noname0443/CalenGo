@@ -8,6 +8,12 @@ import (
 
 // Handler handles operations described by OpenAPI v3 specification.
 type Handler interface {
+	// ConflictAPIV1 implements conflict-api-v1 operation.
+	//
+	// Your GET endpoint.
+	//
+	// GET /api/v1/conflict
+	ConflictAPIV1(ctx context.Context) (ConflictAPIV1Res, error)
 	// DeleteAPIV1Note implements delete-api-v1-note operation.
 	//
 	// Your POST endpoint.

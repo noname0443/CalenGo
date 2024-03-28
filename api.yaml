@@ -128,6 +128,41 @@ paths:
                   x-stoplight:
                     id: yqtljllphf9wx
       parameters: []
+  /api/v1/conflict:
+    get:
+      security:
+        - BasicAuth: []
+      summary: Your GET endpoint
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  x-stoplight:
+                    id: mp0vtbpllhpd7
+                  type: object
+                  required:
+                    - first
+                    - second
+                  properties:
+                    first:
+                      $ref: '#/components/schemas/Note'
+                      x-stoplight:
+                        id: uupsf75x28wyu
+                    second:
+                      $ref: '#/components/schemas/Note'
+                      x-stoplight:
+                        id: f35zbaokatt1u
+        '400':
+          description: Bad Request
+      operationId: conflict-api-v1
+      x-stoplight:
+        id: ho4yimsfhex85
+      x-internal: false
   '/api/v1/user/{user}':
     get:
       security:

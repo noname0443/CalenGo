@@ -140,6 +140,22 @@ func (fm *FeatureManager) StepGetNote(ctx context.Context, note string) (context
 	return ctx, nil
 }
 
+func (fm *FeatureManager) StepGetConflicts(ctx context.Context) (context.Context, error) {
+	client, err := api.NewClient(fmt.Sprintf("http://%s", fm.ip), fm, []api.ClientOption{}...)
+	if err != nil {
+		return ctx, err
+	}
+
+	resp, err := client.ConflictAPIV1(ctx)
+	if err != nil {
+		fm.lastResult = err
+	} else {
+		fm.lastResult = resp
+	}
+
+	return ctx, nil
+}
+
 func (fm *FeatureManager) StepPostNote(ctx context.Context, data *godog.DocString) (context.Context, error) {
 	client, err := api.NewClient(fmt.Sprintf("http://%s", fm.ip), fm, []api.ClientOption{}...)
 	if err != nil {

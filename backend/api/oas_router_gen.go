@@ -61,6 +61,27 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				break
 			}
 			switch elem[0] {
+			case 'c': // Prefix: "conflict"
+				origElem := elem
+				if l := len("conflict"); len(elem) >= l && elem[0:l] == "conflict" {
+					elem = elem[l:]
+				} else {
+					break
+				}
+
+				if len(elem) == 0 {
+					// Leaf node.
+					switch r.Method {
+					case "GET":
+						s.handleConflictAPIV1Request([0]string{}, elemIsEscaped, w, r)
+					default:
+						s.notAllowed(w, r, "GET")
+					}
+
+					return
+				}
+
+				elem = origElem
 			case 'n': // Prefix: "note"
 				origElem := elem
 				if l := len("note"); len(elem) >= l && elem[0:l] == "note" {
@@ -266,6 +287,31 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 				break
 			}
 			switch elem[0] {
+			case 'c': // Prefix: "conflict"
+				origElem := elem
+				if l := len("conflict"); len(elem) >= l && elem[0:l] == "conflict" {
+					elem = elem[l:]
+				} else {
+					break
+				}
+
+				if len(elem) == 0 {
+					switch method {
+					case "GET":
+						// Leaf: ConflictAPIV1
+						r.name = "ConflictAPIV1"
+						r.summary = "Your GET endpoint"
+						r.operationID = "conflict-api-v1"
+						r.pathPattern = "/api/v1/conflict"
+						r.args = args
+						r.count = 0
+						return r, true
+					default:
+						return
+					}
+				}
+
+				elem = origElem
 			case 'n': // Prefix: "note"
 				origElem := elem
 				if l := len("note"); len(elem) >= l && elem[0:l] == "note" {
