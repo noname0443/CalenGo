@@ -2,6 +2,7 @@ package internal
 
 import (
 	"context"
+	"errors"
 
 	api "github.com/noname0443/CalenGo/backend/api"
 	"github.com/sirupsen/logrus"
@@ -18,6 +19,9 @@ func (app *App) GetAPIV1Note(ctx context.Context, params api.GetAPIV1NoteParams)
 }
 
 func (app *App) PostAPIV1Note(ctx context.Context, req api.OptNote) (api.PostAPIV1NoteRes, error) {
+	if req.Value.Name == "" {
+		return &api.PostAPIV1NoteBadRequest{}, errors.New("name is empty")
+	}
 	auth := ctx.Value("credentials").(api.BasicAuth)
 	userId, _, err := app.GetUserByCredentials(auth)
 	logrus.Debug("PostAPIV1Note", req, auth, err)

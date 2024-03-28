@@ -44,7 +44,8 @@ CheckUser()
     <b-navbar id="nav-block" type="dark" variant="dark">
       <b-navbar-nav>
         <RouterLink class="m-2 btn" to="/">Home</RouterLink>
-        <RouterLink class="m-2 btn" to="/calendar">Calendar</RouterLink>
+        <RouterLink v-if="isUser" class="m-2 btn" to="/calendar">Calendar</RouterLink>
+        <RouterLink v-if="isUser" class="m-2 btn" to="/conflict">Conflict</RouterLink>
         <RouterLink v-if="isUser" class="m-2 btn" to="/user">User</RouterLink>
         <RouterLink v-else class="m-2 btn" to="/register">Register</RouterLink>
       </b-navbar-nav>

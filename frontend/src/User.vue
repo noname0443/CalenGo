@@ -3,7 +3,6 @@
 </script>
 
 <template>
-User
 </template>
 
 <style scoped>
