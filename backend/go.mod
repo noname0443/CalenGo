@@ -9,7 +9,7 @@ require (
 	github.com/fsouza/go-dockerclient v1.11.0
 	github.com/go-faster/errors v0.7.1
 	github.com/go-faster/jx v1.1.0
-	github.com/go-sql-driver/mysql v1.8.0
+	github.com/go-sql-driver/mysql v1.8.1
 	github.com/jmoiron/sqlx v1.3.5
 	github.com/ogen-go/ogen v1.0.0
 	github.com/rs/cors v1.10.1
