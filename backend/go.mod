@@ -14,9 +14,9 @@ require (
 	github.com/ogen-go/ogen v1.0.0
 	github.com/rs/cors v1.10.1
 	github.com/sirupsen/logrus v1.9.3
-	go.opentelemetry.io/otel v1.24.0
-	go.opentelemetry.io/otel/metric v1.24.0
-	go.opentelemetry.io/otel/trace v1.24.0
+	go.opentelemetry.io/otel v1.25.0
+	go.opentelemetry.io/otel/metric v1.25.0
+	go.opentelemetry.io/otel/trace v1.25.0
 	go.uber.org/multierr v1.11.0
 )
 
