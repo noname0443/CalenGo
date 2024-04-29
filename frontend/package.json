@@ -16,7 +16,7 @@
     "bootstrap-vue": "^2.23.1",
     "express": "^4.18.3",
     "moment": "^2.30.1",
-    "superagent": "^8.1.2",
+    "superagent": "^9.0.2",
     "unoverlay-vue": "^0.3.0",
     "usemodal-vue3": "^0.3.7",
     "v-spoiler": "^1.0.1",
